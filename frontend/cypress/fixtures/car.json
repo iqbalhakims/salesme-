@@ -1,0 +1,9 @@
+{
+  "make": "Toyota",
+  "model": "Camry",
+  "year": 2023,
+  "price": 85000,
+  "mileage": 12000,
+  "color": "Silver",
+  "description": "Well maintained, single owner"
+}

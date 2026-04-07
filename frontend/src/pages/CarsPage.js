@@ -110,6 +110,12 @@ export default function CarsPage() {
     }
   };
 
+  const deleteCar = async (id, model) => {
+    if (!window.confirm(`Delete "${model}"? This cannot be undone.`)) return;
+    await fetch(`${API}/${id}`, { method: 'DELETE' });
+    fetchCars();
+  };
+
   const updateStatus = async (id, status) => {
     await fetch(`${API}/${id}/status`, {
       method: 'PATCH',
@@ -148,19 +154,17 @@ export default function CarsPage() {
           <h2>Car Inventory ({cars.length})</h2>
           <table>
             <thead>
-              <tr><th>Model</th><th>Price</th><th>Mileage</th><th>Status</th><th>Action</th></tr>
+              <tr><th>Model</th><th>Price</th><th>Mileage</th><th>Status</th><th>Action</th><th>Photos</th><th></th></tr>
             </thead>
             <tbody>
               {cars.map(car => (
                 <React.Fragment key={car.id}>
-                  <tr
-                    style={{ cursor: 'pointer' }}
-                    onClick={() => setExpanded(expanded === car.id ? null : car.id)}>
+                  <tr>
                     <td>{car.model}</td>
                     <td>RM{car.price?.toLocaleString()}</td>
                     <td>{car.mileage?.toLocaleString()} km</td>
                     <td><span className={statusClass(car.status)}>{car.status}</span></td>
-                    <td onClick={e => e.stopPropagation()}>
+                    <td>
                       <select className="btn btn-sm btn-secondary"
                         value={car.status}
                         onChange={e => updateStatus(car.id, e.target.value)}>
@@ -169,12 +173,30 @@ export default function CarsPage() {
                         <option value="sold">Sold</option>
                       </select>
                     </td>
+                    <td>
+                      <button
+                        className="btn btn-sm btn-secondary"
+                        onClick={() => setExpanded(expanded === car.id ? null : car.id)}
+                        style={{ whiteSpace: 'nowrap' }}
+                      >
+                        {expanded === car.id ? '▲ Hide' : '📷 Photos'}
+                      </button>
+                    </td>
+                    <td>
+                      <button
+                        className="btn btn-sm"
+                        onClick={() => deleteCar(car.id, car.model)}
+                        style={{ background: '#fde8ec', color: '#c0392b', whiteSpace: 'nowrap' }}
+                      >
+                        🗑 Delete
+                      </button>
+                    </td>
                   </tr>
                   {expanded === car.id && (
                     <tr>
-                      <td colSpan="5" style={{ background: '#fafafa', padding: '10px 16px' }}>
-                        <div style={{ fontSize: '0.85rem', color: '#555', marginBottom: 6 }}>
-                          Photos — click + to upload, click photo to preview
+                      <td colSpan="7" style={{ background: '#fafafa', padding: '12px 16px' }}>
+                        <div style={{ fontSize: '0.85rem', color: '#555', marginBottom: 8 }}>
+                          Click <strong>+</strong> to upload · Click photo to preview · <strong>✕</strong> to delete
                         </div>
                         <ImageGallery carId={car.id} />
                       </td>
@@ -182,7 +204,7 @@ export default function CarsPage() {
                   )}
                 </React.Fragment>
               ))}
-              {cars.length === 0 && <tr><td colSpan="5" style={{textAlign:'center',color:'#aaa'}}>No cars yet</td></tr>}
+              {cars.length === 0 && <tr><td colSpan="7" style={{textAlign:'center',color:'#aaa'}}>No cars yet</td></tr>}
             </tbody>
           </table>
         </div>

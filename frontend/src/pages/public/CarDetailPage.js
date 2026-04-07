@@ -89,7 +89,7 @@ export default function CarDetailPage() {
           </div>
 
           <a
-            href={`https://wa.me/60123456789?text=${waMsg}`}
+            href={`https://wa.me/60134107845?text=${waMsg}`}
             target="_blank"
             rel="noreferrer"
             className="wa-cta-btn"

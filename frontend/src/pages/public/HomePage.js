@@ -61,7 +61,7 @@ export default function HomePage() {
       <footer className="pub-footer">
         <p>Interested? Chat with us directly on WhatsApp 👇</p>
         <a
-          href="https://wa.me/60123456789?text=Hi%2C%20I%27m%20interested%20in%20one%20of%20your%20cars"
+          href="https://wa.me/60134107845?text=Hi%2C%20I%27m%20interested%20in%20one%20of%20your%20cars"
           target="_blank"
           rel="noreferrer"
           className="wa-float-btn"
