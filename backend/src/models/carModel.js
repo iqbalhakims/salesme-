@@ -26,6 +26,11 @@ const CarModel = {
     );
     return result.affectedRows;
   },
+
+  async delete(id) {
+    const [result] = await pool.query('DELETE FROM cars WHERE id = ?', [id]);
+    return result.affectedRows;
+  },
 };
 
 module.exports = CarModel;

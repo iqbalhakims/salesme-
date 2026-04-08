@@ -7,6 +7,7 @@ const imageController = require('../controllers/imageController');
 router.get('/', carController.getAll);
 router.post('/', carController.create);
 router.patch('/:id/status', carController.updateStatus);
+router.delete('/:id', carController.delete);
 
 // Image routes nested under /:id/images
 router.get('/:id/images', imageController.getImages);
