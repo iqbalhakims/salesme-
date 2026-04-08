@@ -11,7 +11,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1.0.3
@@ -19,6 +19,8 @@ jobs:
           host: ${{ secrets.DROPLET_HOST }}
           username: ${{ secrets.DROPLET_USER }}
           key: ${{ secrets.DROPLET_SSH_KEY }}
+          port: 22
+          use_insecure_cipher: false
           script: |
             cd /opt/salesme
 
