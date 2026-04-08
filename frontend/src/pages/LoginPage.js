@@ -64,7 +64,7 @@ export default function LoginPage() {
               onChange={e => setForm({ ...form, password: e.target.value })}
             />
           </div>
-          <button style={loading ? { ...styles.btn, opacity: 0.7 } : styles.btn} disabled={loading}>
+          <button type="submit" style={loading ? { ...styles.btn, opacity: 0.7 } : styles.btn} disabled={loading}>
             {loading ? 'Logging in...' : 'Login →'}
           </button>
         </form>

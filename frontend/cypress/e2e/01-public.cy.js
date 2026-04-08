@@ -1,7 +1,7 @@
 describe('Public Pages', () => {
   it('loads the homepage', () => {
     cy.visit('/');
-    cy.contains('Car Sales').should('be.visible');
+    cy.contains('iqbalhakim').should('be.visible');
   });
 
   it('shows car listing on homepage', () => {

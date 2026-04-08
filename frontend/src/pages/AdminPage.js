@@ -24,13 +24,13 @@ export default function AdminPage() {
         <button className={page === 'messages' ? 'active' : ''} onClick={() => setPage('messages')}>Messages</button>
         <button
           onClick={() => navigate('/')}
-          style={{ marginLeft: 'auto', background: '#27ae60', color: 'white', borderRadius: 6, padding: '4px 14px', border: 'none', cursor: 'pointer', fontSize: '0.9rem' }}
+          style={{ marginLeft: 'auto', background: 'rgba(255,255,255,0.2)', color: 'white', borderRadius: 6, padding: '4px 14px', border: 'none', cursor: 'pointer', fontSize: '0.9rem' }}
         >
           🌐 View Site
         </button>
         <button
           onClick={handleLogout}
-          style={{ background: 'transparent', color: '#aaa', border: '1px solid #444', borderRadius: 6, padding: '4px 14px', cursor: 'pointer', fontSize: '0.9rem' }}
+          style={{ background: 'transparent', color: 'rgba(255,255,255,0.75)', border: '1px solid rgba(255,255,255,0.3)', borderRadius: 6, padding: '4px 14px', cursor: 'pointer', fontSize: '0.9rem' }}
         >
           Logout
         </button>

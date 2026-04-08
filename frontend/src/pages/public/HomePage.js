@@ -26,8 +26,7 @@ export default function HomePage() {
       <header className="pub-header">
         <div className="pub-header-inner">
           <div>
-            <h1 className="pub-brand">🚗 ReconCars</h1>
-            <p className="pub-tagline">Quality recon cars — best price guaranteed</p>
+            <h1 className="pub-brand">iqbalhakim</h1>
           </div>
           <button className="admin-btn" onClick={() => navigate('/admin')}>
             ⚙️ Admin
