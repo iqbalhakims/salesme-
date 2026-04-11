@@ -17,12 +17,14 @@ function ImageGallery({ carId }) {
   useEffect(() => { fetchImages(); }, [carId]);
 
   const handleUpload = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
+    const files = Array.from(e.target.files);
+    if (!files.length) return;
     setUploading(true);
-    const fd = new FormData();
-    fd.append('image', file);
-    await fetch(`${API}/${carId}/images`, { method: 'POST', body: fd });
+    for (const file of files) {
+      const fd = new FormData();
+      fd.append('image', file);
+      await fetch(`${API}/${carId}/images`, { method: 'POST', body: fd });
+    }
     await fetchImages();
     setUploading(false);
     fileRef.current.value = '';
@@ -40,9 +42,9 @@ function ImageGallery({ carId }) {
         {images.map(img => (
           <div key={img.id} style={{ position: 'relative' }}>
             <img
-              src={`http://localhost:3000/uploads/${img.filename}`}
+              src={`/uploads/${img.filename}`}
               alt="car"
-              onClick={() => setLightbox(`http://localhost:3000/uploads/${img.filename}`)}
+              onClick={() => setLightbox(`/uploads/${img.filename}`)}
               style={{ width: 80, height: 60, objectFit: 'cover', borderRadius: 6, cursor: 'pointer', border: '2px solid #eee' }}
             />
             <button
@@ -61,7 +63,7 @@ function ImageGallery({ carId }) {
           cursor: 'pointer', color: '#aaa', fontSize: 22, flexShrink: 0,
         }}>
           {uploading ? '...' : '+'}
-          <input type="file" accept="image/*" ref={fileRef} onChange={handleUpload} style={{ display: 'none' }} />
+          <input type="file" accept="image/*" multiple ref={fileRef} onChange={handleUpload} style={{ display: 'none' }} />
         </label>
       </div>
 
@@ -72,7 +74,7 @@ function ImageGallery({ carId }) {
             position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)',
             display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000,
           }}>
-          <img src={lightbox} alt="preview" style={{ maxWidth: '90vw', maxHeight: '85vh', borderRadius: 8 }} />
+          <img src={lightbox} alt="preview" style={{ maxWidth: '90vw', maxHeight: '85vh', borderRadius: 8 }} onClick={e => e.stopPropagation()} />
         </div>
       )}
     </div>
