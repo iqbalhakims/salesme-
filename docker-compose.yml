@@ -2,7 +2,7 @@ version: '3'
 
 services:
   frontend:
-    build: ./frontend
+    image: ghcr.io/iqbalhakims/salesme-frontend:latest
     ports:
       - "80:80"
     depends_on:
@@ -10,7 +10,7 @@ services:
     restart: unless-stopped
 
   backend:
-    build: ./backend
+    image: ghcr.io/iqbalhakims/salesme-backend:latest
     expose:
       - "3000"
     depends_on:
