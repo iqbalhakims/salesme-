@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const client = require('prom-client');
 require('dotenv').config();
 
 const carRoutes = require('./routes/carRoutes');
@@ -11,6 +12,8 @@ const videoRoutes = require('./routes/videoRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+client.collectDefaultMetrics();
 
 app.use(cors());
 app.use(express.json());
@@ -24,6 +27,11 @@ app.use('/api/cars/:id/videos', videoRoutes);
 
 app.get('/health', (_req, res) => {
   res.json({ status: 'ok', message: 'Car Sales CRM API is running' });
+});
+
+app.get('/metrics', async (_req, res) => {
+  res.set('Content-Type', client.register.contentType);
+  res.end(await client.register.metrics());
 });
 
 app.listen(PORT, () => {
