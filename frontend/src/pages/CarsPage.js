@@ -6,8 +6,10 @@ function resizeImage(file, maxPx = 1200, quality = 0.82) {
   return new Promise((resolve) => {
     const img = new Image();
     const url = URL.createObjectURL(file);
+    const cleanup = () => URL.revokeObjectURL(url);
+    img.onerror = () => { cleanup(); resolve(file); }; // fallback: upload original
     img.onload = () => {
-      URL.revokeObjectURL(url);
+      cleanup();
       let { width, height } = img;
       if (width <= maxPx && height <= maxPx) { resolve(file); return; }
       if (width > height) { height = Math.round(height * maxPx / width); width = maxPx; }
@@ -15,7 +17,10 @@ function resizeImage(file, maxPx = 1200, quality = 0.82) {
       const canvas = document.createElement('canvas');
       canvas.width = width; canvas.height = height;
       canvas.getContext('2d').drawImage(img, 0, 0, width, height);
-      canvas.toBlob(blob => resolve(new File([blob], file.name, { type: 'image/jpeg' })), 'image/jpeg', quality);
+      canvas.toBlob(
+        blob => resolve(blob ? new File([blob], file.name, { type: 'image/jpeg' }) : file),
+        'image/jpeg', quality
+      );
     };
     img.src = url;
   });
@@ -39,15 +44,22 @@ function ImageGallery({ carId }) {
     const files = Array.from(e.target.files);
     if (!files.length) return;
     setUploading(true);
-    const resized = await Promise.all(files.map(f => resizeImage(f)));
-    await Promise.all(resized.map(file => {
-      const fd = new FormData();
-      fd.append('image', file);
-      return fetch(`${API}/${carId}/images`, { method: 'POST', body: fd });
-    }));
-    await fetchImages();
-    setUploading(false);
-    fileRef.current.value = '';
+    try {
+      const resized = await Promise.all(files.map(f => resizeImage(f)));
+      const results = await Promise.all(resized.map(file => {
+        const fd = new FormData();
+        fd.append('image', file);
+        return fetch(`${API}/${carId}/images`, { method: 'POST', body: fd }).then(r => r.json());
+      }));
+      const failed = results.filter(r => !r.success);
+      if (failed.length) alert(`${failed.length} image(s) failed to upload`);
+      await fetchImages();
+    } catch (err) {
+      alert('Upload failed: ' + err.message);
+    } finally {
+      setUploading(false);
+      fileRef.current.value = '';
+    }
   };
 
   const handleDelete = async (imageId) => {
