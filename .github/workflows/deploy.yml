@@ -58,11 +58,29 @@ jobs:
           port: 22
           timeout: 30s
           command_timeout: 20m
+          envs: GHCR_TOKEN,DB_PASSWORD,ADMIN_USERNAME,ADMIN_PASSWORD,JWT_SECRET
           script: |
             export PATH=$PATH:/usr/bin:/usr/local/bin
-            echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u iqbalhakims --password-stdin
+            echo "$GHCR_TOKEN" | docker login ghcr.io -u iqbalhakims --password-stdin
             cd /opt/salesme
             git pull origin main
+            mkdir -p backend
+            cat > backend/.env << ENVEOF
+            PORT=3000
+            DB_HOST=db
+            DB_USER=root
+            DB_PASSWORD=$DB_PASSWORD
+            DB_NAME=carcrm
+            ADMIN_USERNAME=$ADMIN_USERNAME
+            ADMIN_PASSWORD=$ADMIN_PASSWORD
+            JWT_SECRET=$JWT_SECRET
+            ENVEOF
             docker compose pull
             docker compose up -d
             docker image prune -f
+        env:
+          GHCR_TOKEN: ${{ secrets.GHCR_TOKEN }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          ADMIN_USERNAME: ${{ secrets.ADMIN_USERNAME }}
+          ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
