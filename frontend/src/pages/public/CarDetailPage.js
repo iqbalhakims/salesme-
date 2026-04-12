@@ -9,6 +9,7 @@ export default function CarDetailPage() {
   const [images, setImages] = useState([]);
   const [active, setActive] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [lightbox, setLightbox] = useState(false);
 
   useEffect(() => {
     Promise.all([
@@ -41,7 +42,7 @@ export default function CarDetailPage() {
       <main className="pub-main detail-wrap">
         {/* Gallery */}
         <div className="detail-gallery">
-          <div className="detail-main-img">
+          <div className="detail-main-img" onClick={() => images.length > 0 && setLightbox(true)} style={{ cursor: images.length > 0 ? 'zoom-in' : 'default' }}>
             {images.length > 0
               ? <img src={`/uploads/${images[active].filename}`} alt={car.model} />
               : <div className="pub-card-img-placeholder large">🚗</div>
@@ -58,6 +59,24 @@ export default function CarDetailPage() {
                   onClick={() => setActive(i)}
                 />
               ))}
+            </div>
+          )}
+
+          {lightbox && (
+            <div className="lightbox-overlay" onClick={() => setLightbox(false)}>
+              <button className="lightbox-close" onClick={() => setLightbox(false)}>✕</button>
+              <img
+                src={`/uploads/${images[active].filename}`}
+                alt={car.model}
+                className="lightbox-img"
+                onClick={e => e.stopPropagation()}
+              />
+              {images.length > 1 && (
+                <>
+                  <button className="lightbox-prev" onClick={e => { e.stopPropagation(); setActive(i => (i - 1 + images.length) % images.length); }}>‹</button>
+                  <button className="lightbox-next" onClick={e => { e.stopPropagation(); setActive(i => (i + 1) % images.length); }}>›</button>
+                </>
+              )}
             </div>
           )}
         </div>
