@@ -69,9 +69,6 @@ export default function LoginPage() {
           </button>
         </form>
 
-        <p style={styles.hint}>
-          Default: <code>admin</code> / <code>admin123</code>
-        </p>
       </div>
     </div>
   );
@@ -109,5 +106,4 @@ const styles = {
     border: 'none', borderRadius: 8, fontSize: '1rem', fontWeight: 700,
     cursor: 'pointer', transition: 'background 0.2s',
   },
-  hint: { marginTop: 20, color: '#aaa', fontSize: '0.78rem' },
 };

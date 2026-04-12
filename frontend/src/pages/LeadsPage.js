@@ -70,7 +70,7 @@ export default function LeadsPage() {
 
         <div className="card">
           <h2>Leads ({leads.length})</h2>
-          <table>
+          <div className="table-wrap"><table>
             <thead>
               <tr><th>Name</th><th>Phone</th><th>Car</th><th>Follow-Up</th><th>Status</th></tr>
             </thead>
@@ -94,7 +94,7 @@ export default function LeadsPage() {
               ))}
               {leads.length === 0 && <tr><td colSpan="5" style={{textAlign:'center',color:'#aaa'}}>No leads yet</td></tr>}
             </tbody>
-          </table>
+          </table></div>
         </div>
       </div>
     </div>

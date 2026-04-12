@@ -256,7 +256,7 @@ export default function CarsPage() {
 
         <div className="card">
           <h2>Car Inventory ({cars.length})</h2>
-          <div style={{ overflowX: 'auto' }}><table>
+          <div className="table-wrap"><table>
             <thead>
               <tr><th>Model</th><th>Photos</th><th>Price</th><th>Mileage</th><th>Status</th><th>Action</th><th></th></tr>
             </thead>

@@ -8,6 +8,7 @@ import '../index.css';
 
 export default function AdminPage() {
   const [page, setPage] = useState('cars');
+  const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -15,25 +16,22 @@ export default function AdminPage() {
     navigate('/admin/login');
   };
 
+  const navTo = (p) => { setPage(p); setMenuOpen(false); };
+
   return (
     <div>
-      <nav>
+      <nav className="admin-nav">
         <h1>🚗 Car Sales CRM</h1>
-        <button className={page === 'cars' ? 'active' : ''} onClick={() => setPage('cars')}>Cars</button>
-        <button className={page === 'leads' ? 'active' : ''} onClick={() => setPage('leads')}>Leads</button>
-        <button className={page === 'messages' ? 'active' : ''} onClick={() => setPage('messages')}>Messages</button>
-        <button
-          onClick={() => navigate('/')}
-          style={{ marginLeft: 'auto', background: 'rgba(255,255,255,0.2)', color: 'white', borderRadius: 6, padding: '4px 14px', border: 'none', cursor: 'pointer', fontSize: '0.9rem' }}
-        >
-          🌐 View Site
+        <button className="hamburger" onClick={() => setMenuOpen(o => !o)} aria-label="Menu">
+          {menuOpen ? '✕' : '☰'}
         </button>
-        <button
-          onClick={handleLogout}
-          style={{ background: 'transparent', color: 'rgba(255,255,255,0.75)', border: '1px solid rgba(255,255,255,0.3)', borderRadius: 6, padding: '4px 14px', cursor: 'pointer', fontSize: '0.9rem' }}
-        >
-          Logout
-        </button>
+        <div className={`nav-links${menuOpen ? ' open' : ''}`}>
+          <button className={page === 'cars' ? 'active' : ''} onClick={() => navTo('cars')}>Cars</button>
+          <button className={page === 'leads' ? 'active' : ''} onClick={() => navTo('leads')}>Leads</button>
+          <button className={page === 'messages' ? 'active' : ''} onClick={() => navTo('messages')}>Messages</button>
+          <button onClick={() => { navigate('/'); setMenuOpen(false); }} className="nav-util">🌐 View Site</button>
+          <button onClick={handleLogout} className="nav-util nav-logout">Logout</button>
+        </div>
       </nav>
       <div className="container">
         {page === 'cars' && <CarsPage />}
