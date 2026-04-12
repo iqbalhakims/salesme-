@@ -85,7 +85,7 @@ function CarCard({ car, onClick }) {
     <div className="pub-card" onClick={onClick}>
       <div className="pub-card-img">
         {thumb
-          ? <img src={`http://localhost:3000/uploads/${thumb}`} alt={car.model} />
+          ? <img src={`/uploads/${thumb}`} alt={car.model} />
           : <div className="pub-card-img-placeholder">🚗</div>
         }
       </div>
