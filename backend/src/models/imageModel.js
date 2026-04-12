@@ -3,7 +3,7 @@ const pool = require('../config/database');
 const ImageModel = {
   async getByCarId(car_id) {
     const [rows] = await pool.query(
-      'SELECT * FROM car_images WHERE car_id = ? ORDER BY created_at DESC',
+      'SELECT * FROM car_images WHERE car_id = ? ORDER BY created_at ASC',
       [car_id]
     );
     return rows;
