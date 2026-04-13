@@ -7,6 +7,8 @@ CREATE TABLE IF NOT EXISTS cars (
   price INT,
   mileage INT,
   `condition` VARCHAR(100),
+  year INT,
+  grade VARCHAR(50),
   status VARCHAR(50) DEFAULT 'available',
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

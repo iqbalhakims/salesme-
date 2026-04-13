@@ -189,7 +189,7 @@ function VideoGallery({ carId }) {
 
 export default function CarsPage() {
   const [cars, setCars] = useState([]);
-  const [form, setForm] = useState({ model: '', price: '', mileage: '', condition: '' });
+  const [form, setForm] = useState({ model: '', price: '', mileage: '', condition: '', year: '', grade: '' });
   const [photos, setPhotos] = useState([]);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
@@ -223,7 +223,7 @@ export default function CarsPage() {
           return fetch(`${API}/${carId}/images`, { method: 'POST', body: fd });
         }));
       }
-      setForm({ model: '', price: '', mileage: '', condition: '' });
+      setForm({ model: '', price: '', mileage: '', condition: '', year: '', grade: '' });
       setPhotos([]);
       fetchCars();
     } else {
@@ -268,6 +268,10 @@ export default function CarsPage() {
               value={form.mileage} onChange={e => setForm({ ...form, mileage: e.target.value })} />
             <input placeholder="Condition (e.g. Good)"
               value={form.condition} onChange={e => setForm({ ...form, condition: e.target.value })} />
+            <input type="number" placeholder="Year (e.g. 2020)"
+              value={form.year} onChange={e => setForm({ ...form, year: e.target.value })} />
+            <input placeholder="Grade (e.g. A, B+)"
+              value={form.grade} onChange={e => setForm({ ...form, grade: e.target.value })} />
             <label style={{
               border: '2px dashed #ccc', borderRadius: 6, padding: '10px 12px',
               cursor: 'pointer', color: '#888', fontSize: '0.95rem', textAlign: 'center',

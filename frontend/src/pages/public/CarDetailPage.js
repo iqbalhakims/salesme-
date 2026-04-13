@@ -187,6 +187,18 @@ export default function CarDetailPage() {
             <p className="detail-price">RM {car.price?.toLocaleString()}</p>
 
             <div className="detail-specs">
+              {car.year && (
+                <div className="spec-row">
+                  <span className="spec-label">Year</span>
+                  <span className="spec-value">{car.year}</span>
+                </div>
+              )}
+              {car.grade && (
+                <div className="spec-row">
+                  <span className="spec-label">Grade</span>
+                  <span className="spec-value">{car.grade}</span>
+                </div>
+              )}
               <div className="spec-row">
                 <span className="spec-label">Mileage</span>
                 <span className="spec-value">{car.mileage?.toLocaleString()} km</span>

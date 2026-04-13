@@ -103,8 +103,10 @@ function CarCard({ car, onClick }) {
         <p className="pub-card-price">RM {car.price?.toLocaleString()}</p>
         <h3 className="pub-card-title">{car.model}</h3>
         <div className="pub-card-meta">
+          {car.year ? <span>📅 {car.year}</span> : null}
           {car.mileage ? <span>🛣 {car.mileage.toLocaleString()} km</span> : null}
           {car.condition ? <span>⚙️ {car.condition}</span> : null}
+          {car.grade ? <span>🏷 {car.grade}</span> : null}
         </div>
       </div>
     </div>

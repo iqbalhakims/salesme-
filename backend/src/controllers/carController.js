@@ -12,12 +12,12 @@ const carController = {
 
   async create(req, res) {
     try {
-      const { model, price, condition } = req.body;
+      const { model, price, condition, year, grade } = req.body;
       const mileage = req.body.mileage !== '' ? req.body.mileage : null;
       if (!model || !price) {
         return res.status(400).json({ success: false, message: 'model and price are required' });
       }
-      const id = await CarModel.create({ model, price, mileage: mileage || null, condition: condition || null });
+      const id = await CarModel.create({ model, price, mileage: mileage || null, condition: condition || null, year: year || null, grade: grade || null });
       const car = await CarModel.getById(id);
       res.status(201).json({ success: true, data: car });
     } catch (err) {
