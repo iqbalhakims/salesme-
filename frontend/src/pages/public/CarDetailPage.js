@@ -220,7 +220,7 @@ export default function CarDetailPage() {
 
         {/* Loan Calculator — full width below */}
         <div className="calc-section">
-          <LoanCalculator carPrice={car.price || 0} />
+          <LoanCalculator key={car.id} carPrice={car.price || 0} />
         </div>
       </main>
     </div>
