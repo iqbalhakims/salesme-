@@ -64,17 +64,9 @@ jobs:
             echo "$GHCR_TOKEN" | docker login ghcr.io -u iqbalhakims --password-stdin
             cd /opt/salesme
             git pull origin main
+            printf "DB_PASSWORD=%s\nDB_NAME=carcrm\n" "$DB_PASSWORD" > .env
             mkdir -p backend
-            cat > backend/.env << ENVEOF
-            PORT=3000
-            DB_HOST=db
-            DB_USER=root
-            DB_PASSWORD=$DB_PASSWORD
-            DB_NAME=carcrm
-            ADMIN_USERNAME=$ADMIN_USERNAME
-            ADMIN_PASSWORD=$ADMIN_PASSWORD
-            JWT_SECRET=$JWT_SECRET
-            ENVEOF
+            printf "PORT=3000\nDB_HOST=db\nDB_USER=root\nDB_PASSWORD=%s\nDB_NAME=carcrm\nADMIN_USERNAME=%s\nADMIN_PASSWORD=%s\nJWT_SECRET=%s\n" "$DB_PASSWORD" "$ADMIN_USERNAME" "$ADMIN_PASSWORD" "$JWT_SECRET" > backend/.env
             docker compose pull frontend backend
             docker compose up -d
             docker image prune -f
