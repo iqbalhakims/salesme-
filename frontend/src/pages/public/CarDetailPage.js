@@ -197,7 +197,7 @@ export default function CarDetailPage() {
               </div>
               <div className="spec-row">
                 <span className="spec-label">Status</span>
-                <span className="spec-value" style={{ color: '#27ae60', fontWeight: 700 }}>Available</span>
+                <span className="spec-value" style={{ color: '#3a8c6e', fontWeight: 700 }}>Available</span>
               </div>
             </div>
 
