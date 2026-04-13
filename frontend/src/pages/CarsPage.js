@@ -46,13 +46,14 @@ function ImageGallery({ carId }) {
     setUploading(true);
     try {
       const resized = await Promise.all(files.map(f => resizeImage(f)));
-      const results = await Promise.all(resized.map(file => {
+      let failed = 0;
+      for (const file of resized) {
         const fd = new FormData();
         fd.append('image', file);
-        return fetch(`${API}/${carId}/images`, { method: 'POST', body: fd }).then(r => r.json());
-      }));
-      const failed = results.filter(r => !r.success);
-      if (failed.length) alert(`${failed.length} image(s) failed to upload`);
+        const r = await fetch(`${API}/${carId}/images`, { method: 'POST', body: fd }).then(r => r.json());
+        if (!r.success) failed++;
+      }
+      if (failed) alert(`${failed} image(s) failed to upload`);
       await fetchImages();
     } catch (err) {
       alert('Upload failed: ' + err.message);
@@ -219,11 +220,11 @@ export default function CarsPage() {
       const carId = data.data.id;
       if (photos.length) {
         const resized = await Promise.all(photos.map(f => resizeImage(f)));
-        await Promise.all(resized.map(file => {
+        for (const file of resized) {
           const fd = new FormData();
           fd.append('image', file);
-          return fetch(`${API}/${carId}/images`, { method: 'POST', body: fd });
-        }));
+          await fetch(`${API}/${carId}/images`, { method: 'POST', body: fd });
+        }
       }
       setForm({ model: '', price: '', mileage: '', condition: '', year: '', grade: '' });
       setPhotos([]);
