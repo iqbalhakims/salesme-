@@ -39,3 +39,13 @@ CREATE TABLE IF NOT EXISTS leads (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (car_id) REFERENCES cars(id) ON DELETE SET NULL
 );
+
+CREATE TABLE IF NOT EXISTS appointments (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  lead_id INT NOT NULL,
+  appointment_date DATETIME NOT NULL,
+  notes TEXT,
+  status ENUM('scheduled', 'completed', 'cancelled') DEFAULT 'scheduled',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (lead_id) REFERENCES leads(id) ON DELETE CASCADE
+);
