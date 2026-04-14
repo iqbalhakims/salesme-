@@ -9,8 +9,24 @@ const messageRoutes = require('./routes/messageRoutes');
 const authRoutes = require('./routes/authRoutes');
 const videoRoutes = require('./routes/videoRoutes');
 
+const pool = require('./config/database');
+
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+async function waitForDb(retries = 10, delayMs = 3000) {
+  for (let i = 1; i <= retries; i++) {
+    try {
+      await pool.query('SELECT 1');
+      console.log('DB connection established');
+      return;
+    } catch (err) {
+      console.log(`DB not ready (attempt ${i}/${retries}): ${err.message}`);
+      if (i === retries) throw err;
+      await new Promise(r => setTimeout(r, delayMs));
+    }
+  }
+}
 
 app.use(cors());
 app.use(express.json());
@@ -26,8 +42,8 @@ app.get('/health', (_req, res) => {
   res.json({ status: 'ok', message: 'Car Sales CRM API is running' });
 });
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+waitForDb()
+  .then(() => app.listen(PORT, () => console.log(`Server running on port ${PORT}`)))
+  .catch(err => { console.error('Could not connect to DB:', err.message); process.exit(1); });
 
 module.exports = app;
