@@ -48,14 +48,14 @@
   background: white; border-radius: 10px;
   overflow: hidden; cursor: pointer;
   box-shadow: 0 1px 4px rgba(0,0,0,0.10);
-  transition: box-shadow 0.15s;
+  transition: box-shadow 0.2s, transform 0.2s;
 }
-.pub-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.16); }
+.pub-card:hover { box-shadow: 0 8px 28px rgba(0,0,0,0.13); transform: translateY(-3px); }
 .pub-card--new {
   border: 2px solid #22c55e;
   box-shadow: 0 1px 4px rgba(34,197,94,0.20);
 }
-.pub-card--new:hover { box-shadow: 0 4px 16px rgba(34,197,94,0.30); }
+.pub-card--new:hover { box-shadow: 0 8px 28px rgba(34,197,94,0.25); transform: translateY(-3px); }
 .pub-card-img { height: 140px; background: #f0f0f0; overflow: hidden; position: relative; }
 .pub-card-img img { width: 100%; height: 140px; object-fit: cover; display: block; }
 @media (min-width: 640px) { .pub-card-img, .pub-card-img img { height: 170px; } }
