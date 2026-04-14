@@ -134,8 +134,6 @@ export default function CarDetailPage() {
   if (loading) return <div className="pub-layout"><p className="pub-empty">Loading...</p></div>;
   if (!car) return <div className="pub-layout"><p className="pub-empty">Car not found.</p></div>;
 
-  const waMsg = encodeURIComponent(`Hi, I'm interested in the ${car.model} (RM${car.price?.toLocaleString()}). Is it still available?`);
-
   return (
     <div className="pub-layout">
       <header className="pub-header">
@@ -232,14 +230,6 @@ export default function CarDetailPage() {
               <span>✅ Viewing available</span>
             </div>
 
-            <a
-              href={`https://wa.me/60134107845?text=${waMsg}`}
-              target="_blank"
-              rel="noreferrer"
-              className="wa-cta-btn"
-            >
-              💬 WhatsApp to Enquire
-            </a>
           </div>
         </div>
 
