@@ -117,14 +117,14 @@
 
 .wa-cta-btn {
   display: block; text-align: center;
-  background: #5ba4cf; color: white;
+  background: #3a8c6e; color: white;
   padding: 14px; border-radius: 12px;
   font-weight: 700; font-size: 1.05rem;
   text-decoration: none;
-  box-shadow: 0 4px 14px rgba(91,164,207,0.35);
+  box-shadow: 0 4px 14px rgba(58,140,110,0.35);
   transition: background 0.2s;
 }
-.wa-cta-btn:hover { background: #4a90b8; }
+.wa-cta-btn:hover { background: #2e7058; }
 
 /* Dents & Scratches */
 .dent-section { margin-top: 32px; }

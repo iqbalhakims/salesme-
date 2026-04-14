@@ -98,7 +98,7 @@ function LoanCalculator({ carPrice, carModel, carYear, carRef }) {
         </div>
         <p className="calc-disclaimer">* Estimate only. Actual rate subject to bank approval.</p>
         <a href={`https://wa.me/60134107845?text=${waMsg}`} target="_blank" rel="noreferrer" className="wa-cta-btn">
-          💬 I want to book this car
+          I want to book this car
         </a>
       </div>
     </div>
