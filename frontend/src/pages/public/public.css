@@ -23,15 +23,63 @@
 .pub-main { max-width: 1100px; margin: 0 auto; padding: 24px 16px; }
 .pub-empty { text-align: center; color: #999; padding: 60px 0; font-size: 1rem; }
 
-/* Search */
-.pub-search-wrap { margin-bottom: 24px; }
+/* Toolbar */
+.pub-toolbar { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
 .pub-search {
-  width: 100%; padding: 12px 18px;
+  flex: 1; min-width: 180px; padding: 12px 18px;
   border: 1px solid #ddd; border-radius: 30px;
   font-size: 1rem; outline: none;
   box-shadow: 0 2px 8px rgba(0,0,0,0.06);
 }
-.pub-search:focus { border-color: #e94560; }
+.pub-search:focus { border-color: #5ba4cf; }
+.pub-sort {
+  padding: 10px 14px; border: 1px solid #ddd; border-radius: 30px;
+  font-size: 0.9rem; outline: none; background: white; cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+.pub-filter-btn {
+  padding: 10px 16px; border: 1px solid #ddd; border-radius: 30px;
+  font-size: 0.9rem; background: white; cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06); transition: all 0.15s;
+}
+.pub-filter-btn.active { background: #5ba4cf; color: white; border-color: #5ba4cf; }
+
+/* Filter panel */
+.pub-filter-panel {
+  background: white; border: 1px solid #e5e7eb; border-radius: 12px;
+  padding: 16px; margin-bottom: 16px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+}
+.pub-filter-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+@media (min-width: 640px) { .pub-filter-grid { grid-template-columns: repeat(3, 1fr); } }
+@media (min-width: 900px) { .pub-filter-grid { grid-template-columns: repeat(4, 1fr); } }
+.pub-filter-field { display: flex; flex-direction: column; gap: 4px; }
+.pub-filter-field label { font-size: 0.75rem; font-weight: 600; color: #666; }
+.pub-filter-field input, .pub-filter-field select {
+  padding: 8px 10px; border: 1px solid #ddd; border-radius: 8px;
+  font-size: 0.85rem; outline: none; background: white;
+}
+.pub-filter-field input:focus, .pub-filter-field select:focus { border-color: #5ba4cf; }
+.pub-clear-btn {
+  margin-top: 12px; padding: 6px 14px; background: none;
+  border: 1px solid #e94560; color: #e94560; border-radius: 20px;
+  font-size: 0.82rem; cursor: pointer;
+}
+.pub-clear-btn:hover { background: #e94560; color: white; }
+
+/* Count */
+.pub-count { font-size: 0.82rem; color: #999; margin: 0 0 14px; }
+
+/* Pagination */
+.pub-pagination { display: flex; justify-content: center; gap: 6px; margin-top: 32px; flex-wrap: wrap; }
+.pub-page-btn {
+  padding: 8px 14px; border: 1px solid #ddd; border-radius: 8px;
+  background: white; cursor: pointer; font-size: 0.9rem; transition: all 0.15s;
+}
+.pub-page-btn:hover:not(:disabled) { border-color: #5ba4cf; color: #5ba4cf; }
+.pub-page-btn.active { background: #5ba4cf; border-color: #5ba4cf; color: white; font-weight: 700; }
+.pub-page-btn:disabled { opacity: 0.35; cursor: default; }
+.pub-link-btn { background: none; border: none; color: #5ba4cf; cursor: pointer; font-size: 1rem; text-decoration: underline; padding: 0; }
 
 /* Car grid — 2 columns always, 4 on wider screens */
 .pub-grid {

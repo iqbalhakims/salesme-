@@ -1,11 +1,17 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './public.css';
+
+const PAGE_SIZE = 12;
 
 export default function HomePage() {
   const [cars, setCars] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+  const [sort, setSort] = useState('newest');
+  const [filters, setFilters] = useState({ make: '', minPrice: '', maxPrice: '', minYear: '', maxYear: '', maxMileage: '', condition: '' });
+  const [page, setPage] = useState(1);
+  const [showFilters, setShowFilters] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -17,44 +23,164 @@ export default function HomePage() {
       });
   }, []);
 
-  const filtered = cars.filter(c =>
-    c.model.toLowerCase().includes(search.toLowerCase())
-  );
+  // Derived filter options from data
+  const makes = useMemo(() => {
+    const set = new Set(cars.map(c => c.model?.split(' ')[0]).filter(Boolean));
+    return [...set].sort();
+  }, [cars]);
+
+  const conditions = useMemo(() => {
+    const set = new Set(cars.map(c => c.condition).filter(Boolean));
+    return [...set].sort();
+  }, [cars]);
+
+  const filtered = useMemo(() => {
+    let result = cars.filter(c => {
+      if (search && !c.model.toLowerCase().includes(search.toLowerCase())) return false;
+      if (filters.make && !c.model.toLowerCase().startsWith(filters.make.toLowerCase())) return false;
+      if (filters.minPrice && c.price < Number(filters.minPrice)) return false;
+      if (filters.maxPrice && c.price > Number(filters.maxPrice)) return false;
+      if (filters.minYear && c.year < Number(filters.minYear)) return false;
+      if (filters.maxYear && c.year > Number(filters.maxYear)) return false;
+      if (filters.maxMileage && c.mileage > Number(filters.maxMileage)) return false;
+      if (filters.condition && c.condition !== filters.condition) return false;
+      return true;
+    });
+
+    if (sort === 'price_asc')  result = [...result].sort((a, b) => a.price - b.price);
+    if (sort === 'price_desc') result = [...result].sort((a, b) => b.price - a.price);
+    if (sort === 'newest')     result = [...result].sort((a, b) => b.id - a.id);
+    if (sort === 'mileage')    result = [...result].sort((a, b) => (a.mileage || 0) - (b.mileage || 0));
+
+    return result;
+  }, [cars, search, filters, sort]);
+
+  // Reset to page 1 when filters/search/sort change
+  useEffect(() => { setPage(1); }, [search, filters, sort]);
+
+  const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
+  const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+
+  const hasActiveFilters = Object.values(filters).some(v => v !== '');
+
+  const clearFilters = () => {
+    setFilters({ make: '', minPrice: '', maxPrice: '', minYear: '', maxYear: '', maxMileage: '', condition: '' });
+    setSearch('');
+  };
 
   return (
     <div className="pub-layout">
       <header className="pub-header">
         <div className="pub-header-inner">
-          <div>
-            <h1 className="pub-brand">iqbalhakim</h1>
-          </div>
-          <button className="admin-btn" onClick={() => navigate('/admin')}>
-            ⚙️ Admin
-          </button>
+          <h1 className="pub-brand">iqbalhakim</h1>
+          <button className="admin-btn" onClick={() => navigate('/admin')}>⚙️ Admin</button>
         </div>
       </header>
 
       <main className="pub-main">
-        <div className="pub-search-wrap">
+        {/* Search + Sort bar */}
+        <div className="pub-toolbar">
           <input
             className="pub-search"
             placeholder="🔍  Search by model..."
             value={search}
             onChange={e => setSearch(e.target.value)}
           />
+          <select className="pub-sort" value={sort} onChange={e => setSort(e.target.value)}>
+            <option value="newest">Newest</option>
+            <option value="price_asc">Price: Low → High</option>
+            <option value="price_desc">Price: High → Low</option>
+            <option value="mileage">Lowest Mileage</option>
+          </select>
+          <button
+            className={`pub-filter-btn${hasActiveFilters ? ' active' : ''}`}
+            onClick={() => setShowFilters(v => !v)}
+          >
+            ⚙ Filters{hasActiveFilters ? ' •' : ''}
+          </button>
         </div>
+
+        {/* Filter panel */}
+        {showFilters && (
+          <div className="pub-filter-panel">
+            <div className="pub-filter-grid">
+              <div className="pub-filter-field">
+                <label>Make</label>
+                <select value={filters.make} onChange={e => setFilters({ ...filters, make: e.target.value })}>
+                  <option value="">All</option>
+                  {makes.map(m => <option key={m} value={m}>{m}</option>)}
+                </select>
+              </div>
+              <div className="pub-filter-field">
+                <label>Min Price (RM)</label>
+                <input type="number" placeholder="e.g. 30000" value={filters.minPrice} onChange={e => setFilters({ ...filters, minPrice: e.target.value })} />
+              </div>
+              <div className="pub-filter-field">
+                <label>Max Price (RM)</label>
+                <input type="number" placeholder="e.g. 80000" value={filters.maxPrice} onChange={e => setFilters({ ...filters, maxPrice: e.target.value })} />
+              </div>
+              <div className="pub-filter-field">
+                <label>Min Year</label>
+                <input type="number" placeholder="e.g. 2018" value={filters.minYear} onChange={e => setFilters({ ...filters, minYear: e.target.value })} />
+              </div>
+              <div className="pub-filter-field">
+                <label>Max Year</label>
+                <input type="number" placeholder="e.g. 2024" value={filters.maxYear} onChange={e => setFilters({ ...filters, maxYear: e.target.value })} />
+              </div>
+              <div className="pub-filter-field">
+                <label>Max Mileage (km)</label>
+                <input type="number" placeholder="e.g. 80000" value={filters.maxMileage} onChange={e => setFilters({ ...filters, maxMileage: e.target.value })} />
+              </div>
+              <div className="pub-filter-field">
+                <label>Condition</label>
+                <select value={filters.condition} onChange={e => setFilters({ ...filters, condition: e.target.value })}>
+                  <option value="">All</option>
+                  {conditions.map(c => <option key={c} value={c}>{c}</option>)}
+                </select>
+              </div>
+            </div>
+            {hasActiveFilters && (
+              <button className="pub-clear-btn" onClick={clearFilters}>✕ Clear filters</button>
+            )}
+          </div>
+        )}
+
+        {/* Count indicator */}
+        {!loading && (
+          <p className="pub-count">
+            {filtered.length === cars.length
+              ? `Showing all ${cars.length} cars`
+              : `${filtered.length} of ${cars.length} cars`}
+            {totalPages > 1 && ` — page ${page} of ${totalPages}`}
+          </p>
+        )}
 
         {loading && <p className="pub-empty">Loading cars...</p>}
 
         {!loading && filtered.length === 0 && (
-          <p className="pub-empty">No available cars right now. Check back soon!</p>
+          <p className="pub-empty">No cars match your filters. <button className="pub-link-btn" onClick={clearFilters}>Clear filters</button></p>
         )}
 
         <div className="pub-grid">
-          {filtered.map(car => (
+          {paginated.map(car => (
             <CarCard key={car.id} car={car} onClick={() => navigate(`/cars/${car.id}`)} />
           ))}
         </div>
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="pub-pagination">
+            <button className="pub-page-btn" disabled={page === 1} onClick={() => setPage(p => p - 1)}>← Prev</button>
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map(p => (
+              <button
+                key={p}
+                className={`pub-page-btn${p === page ? ' active' : ''}`}
+                onClick={() => setPage(p)}
+              >{p}</button>
+            ))}
+            <button className="pub-page-btn" disabled={page === totalPages} onClick={() => setPage(p => p + 1)}>Next →</button>
+          </div>
+        )}
       </main>
 
       <footer className="pub-footer">
