@@ -58,6 +58,8 @@ export default function HomePage() {
     if (sort === 'newest')     result = [...result].sort((a, b) => b.id - a.id);
     if (sort === 'mileage')    result = [...result].sort((a, b) => (a.mileage || 0) - (b.mileage || 0));
 
+    result = [...result].sort((a, b) => (b.year >= 2024 ? 1 : 0) - (a.year >= 2024 ? 1 : 0));
+
     return result;
   }, [cars, search, filters, sort]);
 
