@@ -198,6 +198,13 @@
 @media (min-width: 640px) { .pub-card-img, .pub-card-img img { height: 170px; } }
 .pub-card-img-placeholder { height: 100%; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; color: #ccc; }
 .pub-card-img-placeholder.large { height: 300px; font-size: 5rem; }
+.pub-card-warranty {
+  background: linear-gradient(90deg, #1e2d3d, #2a4a6b);
+  color: rgba(255,255,255,0.88);
+  font-size: 0.68rem; font-weight: 600;
+  text-align: center; padding: 5px 8px;
+  letter-spacing: 0.03em;
+}
 .pub-card-body { padding: 8px 10px 10px; }
 .pub-card-monthly { font-size: 0.72rem; color: #888; margin: 0 0 2px; }
 .pub-card-price { font-size: 1rem; font-weight: 900; color: #e94560; margin: 0 0 4px; line-height: 1.2; }

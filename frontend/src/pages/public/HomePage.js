@@ -346,6 +346,7 @@ function CarCard({ car, onClick }) {
         )}
         {isNew && <span className="new-car-badge">NEW</span>}
       </div>
+      <div className="pub-card-warranty">🛡️ 8 Years Warranty · Unlimited Mileage</div>
       <div className="pub-card-body">
         {monthly && <p className="pub-card-monthly">est. RM {monthly.toLocaleString()}/mo</p>}
         <p className="pub-card-price">RM {car.price?.toLocaleString()}</p>
