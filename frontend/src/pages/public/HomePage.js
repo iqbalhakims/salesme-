@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './public.css';
 
-const PAGE_SIZE = 12;
+const PAGE_SIZE = 6;
 
 export default function HomePage() {
   const [cars, setCars] = useState([]);
