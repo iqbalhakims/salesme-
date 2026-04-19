@@ -2,7 +2,7 @@
 .pub-layout { min-height: 100vh; background: #f7f8fa; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
 
 /* Header */
-.pub-header { background: #5ba4cf; padding: 14px 20px; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
+.pub-header { background: #0a0f1a; padding: 14px 20px; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 16px rgba(0,0,0,0.5); border-bottom: 1px solid rgba(201,168,76,0.15); }
 .pub-header-inner { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; }
 .pub-brand { color: white; font-size: 1.3rem; margin: 0; }
 .pub-tagline { color: #aaa; font-size: 0.78rem; margin: 2px 0 0; }
@@ -17,7 +17,7 @@
   padding: 6px 14px; border-radius: 20px; cursor: pointer;
   transition: all 0.2s;
 }
-.admin-btn:hover { background: #e94560; border-color: #e94560; color: white; }
+.admin-btn:hover { background: #c9a84c; border-color: #c9a84c; color: #0a0f1a; }
 
 /* Hero banner — animations */
 @keyframes hero-bg-shift {
