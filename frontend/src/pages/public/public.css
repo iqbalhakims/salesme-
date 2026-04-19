@@ -137,6 +137,40 @@
   pointer-events: none;
 }
 
+/* About Us button */
+.about-btn {
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.3);
+  color: white; font-size: 0.82rem;
+  padding: 6px 14px; border-radius: 20px; cursor: pointer;
+  transition: all 0.2s;
+}
+.about-btn:hover { background: rgba(255,255,255,0.28); }
+
+/* About Us section */
+.about-section {
+  background: #1e2d3d;
+  padding: 48px 16px;
+  margin-top: 40px;
+}
+.about-inner {
+  max-width: 1100px; margin: 0 auto;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 36px; align-items: start;
+}
+@media (max-width: 700px) { .about-inner { grid-template-columns: 1fr; } }
+.about-name {
+  font-size: 1.3rem; font-weight: 800; color: white; margin: 0 0 12px;
+}
+.about-desc {
+  font-size: 0.92rem; color: #a8bfcf; line-height: 1.65; margin: 0 0 20px;
+}
+.about-details { display: flex; flex-direction: column; gap: 10px; }
+.about-row { display: flex; align-items: center; gap: 10px; font-size: 0.9rem; color: #c8d8e4; }
+.about-icon { font-size: 1rem; flex-shrink: 0; }
+.about-link { color: #5ba4cf; text-decoration: none; font-weight: 600; }
+.about-link:hover { text-decoration: underline; }
+.about-map { border-radius: 12px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.4); }
+
 /* Footer */
 .pub-footer { text-align: center; padding: 40px 16px; color: #888; font-size: 0.9rem; }
 .wa-float-btn {

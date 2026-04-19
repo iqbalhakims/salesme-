@@ -2,6 +2,14 @@ import { useState, useEffect, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './public.css';
 
+const ABOUT = {
+  name: 'Edaran Idaman Suri Sdn Bhd',
+  description: 'Your trusted used car dealer in Alor Star, Kedah. We offer quality pre-owned vehicles with full loan arrangement, low deposit, and transparent pricing — serving buyers across Peninsular Malaysia.',
+  location: 'Alor Star, Kedah, Malaysia',
+  phone: '0134107845',
+  mapSrc: 'https://maps.google.com/maps?q=Alor+Star,+Kedah,+Malaysia&output=embed',
+};
+
 const PAGE_SIZE = 6;
 
 export default function HomePage() {
@@ -13,6 +21,7 @@ export default function HomePage() {
   const [page, setPage] = useState(1);
   const [showFilters, setShowFilters] = useState(false);
   const navigate = useNavigate();
+  const aboutRef = useRef(null);
 
   useEffect(() => {
     fetch('/api/cars')
@@ -81,7 +90,10 @@ export default function HomePage() {
       <header className="pub-header">
         <div className="pub-header-inner">
           <h1 className="pub-brand">iqbalhakim</h1>
-          <button className="admin-btn" onClick={() => navigate('/admin')}>⚙️ Admin</button>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <button className="about-btn" onClick={() => aboutRef.current?.scrollIntoView({ behavior: 'smooth' })}>About Us</button>
+            <button className="admin-btn" onClick={() => navigate('/admin')}>⚙️ Admin</button>
+          </div>
         </div>
       </header>
 
@@ -207,6 +219,46 @@ export default function HomePage() {
           </div>
         )}
       </main>
+
+      <section ref={aboutRef} className="about-section">
+        <div className="about-inner">
+          <div className="about-info">
+            <h2 className="about-name">{ABOUT.name}</h2>
+            <p className="about-desc">{ABOUT.description}</p>
+            <div className="about-details">
+              <div className="about-row">
+                <span className="about-icon">📍</span>
+                <span>{ABOUT.location}</span>
+              </div>
+              <div className="about-row">
+                <span className="about-icon">📞</span>
+                <a href={`tel:+60${ABOUT.phone.replace(/^0/, '')}`} className="about-link">{ABOUT.phone}</a>
+              </div>
+              <div className="about-row">
+                <span className="about-icon">💬</span>
+                <a
+                  href={`https://wa.me/60${ABOUT.phone.replace(/^0/, '')}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="about-link"
+                >WhatsApp Us</a>
+              </div>
+            </div>
+          </div>
+          <div className="about-map">
+            <iframe
+              title="Location"
+              src={ABOUT.mapSrc}
+              width="100%"
+              height="260"
+              style={{ border: 0, borderRadius: 12 }}
+              allowFullScreen=""
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+            />
+          </div>
+        </div>
+      </section>
 
       <footer className="pub-footer">
         <p>Interested? Chat with us directly on WhatsApp 👇</p>
