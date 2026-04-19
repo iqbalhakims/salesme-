@@ -97,6 +97,20 @@ export default function HomePage() {
         </div>
       </header>
 
+      {/* Hero banner */}
+      <div className="pub-hero">
+        <div className="pub-hero-inner">
+          <div className="pub-hero-badge">🛡️ Peace of Mind</div>
+          <h2 className="pub-hero-title">8 Years Warranty</h2>
+          <p className="pub-hero-sub">Unlimited Mileage · Every Car We Sell</p>
+          <div className="pub-hero-perks">
+            <span>💳 Low Deposit</span>
+            <span>🏦 Full Loan Arrangement</span>
+            <span>🇲🇾 Nationwide Delivery</span>
+          </div>
+        </div>
+      </div>
+
       <main className="pub-main">
         {/* Search + Sort bar */}
         <div className="pub-toolbar">

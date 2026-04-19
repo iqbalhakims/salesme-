@@ -19,6 +19,41 @@
 }
 .admin-btn:hover { background: #e94560; border-color: #e94560; color: white; }
 
+/* Hero banner */
+.pub-hero {
+  background: linear-gradient(135deg, #1e2d3d 0%, #2a4a6b 60%, #5ba4cf 100%);
+  padding: 40px 16px;
+  text-align: center;
+}
+.pub-hero-inner { max-width: 600px; margin: 0 auto; }
+.pub-hero-badge {
+  display: inline-block;
+  background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.25);
+  color: rgba(255,255,255,0.85);
+  font-size: 0.78rem; font-weight: 600; letter-spacing: 0.05em;
+  padding: 4px 14px; border-radius: 20px; margin-bottom: 14px;
+}
+.pub-hero-title {
+  color: white; font-size: 2.4rem; font-weight: 900;
+  margin: 0 0 8px; line-height: 1.1;
+  text-shadow: 0 2px 12px rgba(0,0,0,0.3);
+}
+@media (max-width: 480px) { .pub-hero-title { font-size: 1.8rem; } }
+.pub-hero-sub {
+  color: rgba(255,255,255,0.75); font-size: 1.05rem;
+  margin: 0 0 24px; letter-spacing: 0.02em;
+}
+.pub-hero-perks {
+  display: flex; justify-content: center; flex-wrap: wrap; gap: 10px;
+}
+.pub-hero-perks span {
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.2);
+  color: white; font-size: 0.82rem; font-weight: 600;
+  padding: 6px 16px; border-radius: 20px;
+}
+
 /* Main */
 .pub-main { max-width: 1100px; margin: 0 auto; padding: 24px 16px; }
 .pub-empty { text-align: center; color: #999; padding: 60px 0; font-size: 1rem; }
