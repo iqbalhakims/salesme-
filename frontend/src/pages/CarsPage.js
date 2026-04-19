@@ -197,6 +197,7 @@ function VideoGallery({ carId }) {
   const [videos, setVideos] = useState([]);
   const [uploading, setUploading] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [done, setDone] = useState(false);
   const fileRef = useRef();
 
   const fetchVideos = async () => {
@@ -211,6 +212,7 @@ function VideoGallery({ carId }) {
     const file = e.target.files[0];
     if (!file) return;
     setUploading(true);
+    setDone(false);
     setProgress(0);
     const fd = new FormData();
     fd.append('video', file);
@@ -222,7 +224,9 @@ function VideoGallery({ carId }) {
       await fetchVideos();
       setUploading(false);
       setProgress(0);
+      setDone(true);
       fileRef.current.value = '';
+      setTimeout(() => setDone(false), 3000);
     };
     xhr.open('POST', `${API}/${carId}/videos`);
     xhr.send(fd);
@@ -236,6 +240,15 @@ function VideoGallery({ carId }) {
 
   return (
     <div style={{ marginTop: 8 }}>
+      {done && (
+        <div style={{
+          display: 'inline-flex', alignItems: 'center', gap: 6,
+          background: '#e6f9ee', color: '#1a7a4a', border: '1px solid #a3e4bc',
+          borderRadius: 8, padding: '6px 12px', marginBottom: 10, fontSize: '0.88rem', fontWeight: 600,
+        }}>
+          ✅ Video uploaded successfully!
+        </div>
+      )}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
         {videos.map(vid => (
           <div key={vid.id} style={{ position: 'relative', display: 'inline-block' }}>
@@ -255,7 +268,7 @@ function VideoGallery({ carId }) {
           </div>
         ))}
         <label style={{
-          width: 120, border: '2px dashed #ccc', borderRadius: 6, padding: '8px 12px',
+          width: 140, border: '2px dashed #ccc', borderRadius: 6, padding: '8px 12px',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           cursor: uploading ? 'default' : 'pointer', color: '#aaa', fontSize: '0.85rem', gap: 6,
         }}>
@@ -275,6 +288,7 @@ export default function CarsPage() {
   const [error, setError] = useState('');
   const [expanded, setExpanded] = useState(null);
   const [expandedDents, setExpandedDents] = useState(null);
+  const [expandedVideos, setExpandedVideos] = useState(null);
   const [editing, setEditing] = useState(null); // car id being edited
   const [editForm, setEditForm] = useState({});
   const [modelSearch, setModelSearch] = useState('');
@@ -424,7 +438,7 @@ export default function CarsPage() {
           </div>
           <div className="table-wrap"><table>
             <thead>
-              <tr><th>Ref</th><th>Model</th><th>Photos</th><th>Dents</th><th>Price</th><th>Mileage</th><th>Status</th><th>Action</th><th></th><th></th></tr>
+              <tr><th>Ref</th><th>Model</th><th>Photos</th><th>Videos</th><th>Dents</th><th>Price</th><th>Mileage</th><th>Status</th><th>Action</th><th></th><th></th></tr>
             </thead>
             <tbody>
               {filteredCars.map(car => (
@@ -439,6 +453,15 @@ export default function CarsPage() {
                         style={{ whiteSpace: 'nowrap' }}
                       >
                         {expanded === car.id ? '▲ Hide' : '📷 Photos'}
+                      </button>
+                    </td>
+                    <td>
+                      <button
+                        className="btn btn-sm btn-secondary"
+                        onClick={() => setExpandedVideos(expandedVideos === car.id ? null : car.id)}
+                        style={{ whiteSpace: 'nowrap' }}
+                      >
+                        {expandedVideos === car.id ? '▲ Hide' : '🎥 Videos'}
                       </button>
                     </td>
                     <td>
@@ -492,7 +515,7 @@ export default function CarsPage() {
                   </tr>
                   {editing === car.id && (
                     <tr>
-                      <td colSpan="10" style={{ background: '#f0f4ff', padding: '12px 16px' }}>
+                      <td colSpan="11" style={{ background: '#f0f4ff', padding: '12px 16px' }}>
                         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, alignItems: 'flex-end' }}>
                           <input placeholder="Ref No" value={editForm.ref_no} onChange={e => setEditForm({ ...editForm, ref_no: e.target.value })} style={{ flex: '1 1 90px' }} />
                           <input placeholder="Model" value={editForm.model} onChange={e => setEditForm({ ...editForm, model: e.target.value })} style={{ flex: '2 1 180px' }} />
@@ -508,17 +531,23 @@ export default function CarsPage() {
                   )}
                   {expanded === car.id && (
                     <tr>
-                      <td colSpan="10" style={{ background: '#fafafa', padding: '12px 16px' }}>
+                      <td colSpan="11" style={{ background: '#fafafa', padding: '12px 16px' }}>
                         <div style={{ fontSize: '0.85rem', color: '#555', marginBottom: 6 }}>📷 Photos</div>
                         <ImageGallery carId={car.id} />
-                        <div style={{ fontSize: '0.85rem', color: '#555', margin: '12px 0 6px' }}>🎥 Videos</div>
+                      </td>
+                    </tr>
+                  )}
+                  {expandedVideos === car.id && (
+                    <tr>
+                      <td colSpan="11" style={{ background: '#f0f7ff', padding: '12px 16px' }}>
+                        <div style={{ fontSize: '0.85rem', color: '#555', marginBottom: 6 }}>🎥 Videos</div>
                         <VideoGallery carId={car.id} />
                       </td>
                     </tr>
                   )}
                   {expandedDents === car.id && (
                     <tr>
-                      <td colSpan="10" style={{ background: '#fff8f0', padding: '12px 16px' }}>
+                      <td colSpan="11" style={{ background: '#fff8f0', padding: '12px 16px' }}>
                         <div style={{ fontSize: '0.85rem', color: '#555', marginBottom: 6 }}>🔧 Dents & Scratches</div>
                         <DentGallery carId={car.id} />
                       </td>
@@ -526,7 +555,7 @@ export default function CarsPage() {
                   )}
                 </React.Fragment>
               ))}
-              {cars.length === 0 && <tr><td colSpan="10" style={{textAlign:'center',color:'#aaa'}}>No cars yet</td></tr>}
+              {cars.length === 0 && <tr><td colSpan="11" style={{textAlign:'center',color:'#aaa'}}>No cars yet</td></tr>}
             </tbody>
           </table></div>
         </div>
