@@ -111,6 +111,7 @@ export default function CarDetailPage() {
   const [car, setCar] = useState(null);
   const [images, setImages] = useState([]);
   const [dents, setDents] = useState([]);
+  const [videos, setVideos] = useState([]);
   const [active, setActive] = useState(0);
   const [loading, setLoading] = useState(true);
   const [lightbox, setLightbox] = useState(false);
@@ -120,13 +121,15 @@ export default function CarDetailPage() {
       fetch(`/api/cars`).then(r => r.json()),
       fetch(`/api/cars/${id}/images`).then(r => r.json()),
       fetch(`/api/cars/${id}/dents`).then(r => r.json()),
-    ]).then(([carsData, imagesData, dentsData]) => {
+      fetch(`/api/cars/${id}/videos`).then(r => r.json()),
+    ]).then(([carsData, imagesData, dentsData, videosData]) => {
       if (carsData.success) {
         const found = carsData.data.find(c => c.id === parseInt(id));
         setCar(found || null);
       }
       if (imagesData.success) setImages(imagesData.data);
       if (dentsData.success) setDents(dentsData.data);
+      if (videosData.success) setVideos(videosData.data);
       setLoading(false);
     });
   }, [id]);
@@ -259,6 +262,23 @@ export default function CarDetailPage() {
                   {d.filename && <img src={`/uploads/${d.filename}`} alt="dent" className="dent-img" />}
                   {d.note && <p className="dent-note">{d.note}</p>}
                 </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Videos */}
+        {videos.length > 0 && (
+          <div className="dent-section">
+            <h3 className="dent-title">🎥 Videos</h3>
+            <div className="dent-grid">
+              {videos.map(vid => (
+                <video
+                  key={vid.id}
+                  src={`/uploads/${vid.filename}`}
+                  controls
+                  style={{ width: '100%', maxWidth: 360, borderRadius: 8, border: '2px solid #eee' }}
+                />
               ))}
             </div>
           </div>
