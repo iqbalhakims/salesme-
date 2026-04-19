@@ -100,7 +100,6 @@ export default function HomePage() {
       {/* Hero banner */}
       <div className="pub-hero">
         <div className="pub-hero-inner">
-          <div className="pub-hero-badge">🛡️ Peace of Mind</div>
           <h2 className="pub-hero-title">8 Years Warranty</h2>
           <p className="pub-hero-sub">Unlimited Mileage · Every Car We Sell</p>
           <div className="pub-hero-perks">
