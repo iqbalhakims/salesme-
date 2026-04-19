@@ -114,7 +114,7 @@ export default function HomePage() {
             className={`pub-quick-btn${search === 'Alphard' ? ' active' : ''}`}
             onClick={() => setSearch(s => s === 'Alphard' ? '' : 'Alphard')}
           >
-            🚐 Toyota Alphard
+            Toyota Alphard
           </button>
         </div>
 
