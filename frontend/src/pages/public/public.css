@@ -67,6 +67,16 @@
 }
 .pub-clear-btn:hover { background: #e94560; color: white; }
 
+/* Quick filter buttons */
+.pub-quick-filters { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0 4px; }
+.pub-quick-btn {
+  padding: 7px 16px; border: 2px solid #5ba4cf; border-radius: 20px;
+  background: white; color: #5ba4cf; font-size: 0.88rem; font-weight: 600;
+  cursor: pointer; transition: all 0.15s;
+}
+.pub-quick-btn:hover { background: #5ba4cf; color: white; }
+.pub-quick-btn.active { background: #5ba4cf; color: white; }
+
 /* Count */
 .pub-count { font-size: 0.82rem; color: #999; margin: 0 0 14px; }
 

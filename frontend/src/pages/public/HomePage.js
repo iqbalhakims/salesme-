@@ -108,6 +108,16 @@ export default function HomePage() {
           </button>
         </div>
 
+        {/* Quick filter buttons */}
+        <div className="pub-quick-filters">
+          <button
+            className={`pub-quick-btn${search === 'Alphard' ? ' active' : ''}`}
+            onClick={() => setSearch(s => s === 'Alphard' ? '' : 'Alphard')}
+          >
+            🚐 Toyota Alphard
+          </button>
+        </div>
+
         {/* Filter panel */}
         {showFilters && (
           <div className="pub-filter-panel">
