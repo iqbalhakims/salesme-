@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './public.css';
 
@@ -222,23 +222,50 @@ function estimateMonthly(price) {
 
 function CarCard({ car, onClick }) {
   const [thumb, setThumb] = useState(null);
+  const [video, setVideo] = useState(null);
+  const [hovered, setHovered] = useState(false);
+  const videoRef = useRef(null);
 
   useEffect(() => {
     fetch(`/api/cars/${car.id}/images`)
       .then(r => r.json())
       .then(d => { if (d.success && d.data.length) setThumb(d.data[0].filename); });
+    fetch(`/api/cars/${car.id}/videos`)
+      .then(r => r.json())
+      .then(d => { if (d.success && d.data.length) setVideo(d.data[0].filename); });
   }, [car.id]);
+
+  useEffect(() => {
+    if (!videoRef.current) return;
+    if (hovered) videoRef.current.play();
+    else { videoRef.current.pause(); videoRef.current.currentTime = 0; }
+  }, [hovered]);
 
   const monthly = estimateMonthly(car.price);
   const isNew = car.year >= 2024;
 
   return (
-    <div className={`pub-card${isNew ? ' pub-card--new' : ''}`} onClick={onClick}>
+    <div
+      className={`pub-card${isNew ? ' pub-card--new' : ''}`}
+      onClick={onClick}
+      onMouseEnter={() => video && setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
       <div className="pub-card-img">
-        {thumb
+        {video && (
+          <video
+            ref={videoRef}
+            src={`/uploads/${video}`}
+            muted
+            loop
+            playsInline
+            style={{ display: hovered ? 'block' : 'none', width: '100%', height: '100%', objectFit: 'cover' }}
+          />
+        )}
+        {!hovered && (thumb
           ? <img src={`/uploads/${thumb}`} alt={car.model} />
           : <div className="pub-card-img-placeholder">🚗</div>
-        }
+        )}
         {isNew && <span className="new-car-badge">NEW</span>}
       </div>
       <div className="pub-card-body">
