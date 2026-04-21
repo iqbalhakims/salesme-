@@ -14,9 +14,22 @@ export default function BookingPage() {
   const [searchParams] = useSearchParams();
   const preCarId = searchParams.get('car_id') || '';
 
+  const [car, setCar] = useState(null);
   const [date, setDate] = useState(today());
   const [slots, setSlots] = useState({ available: ALL_SLOTS, booked: [] });
   const [loadingSlots, setLoadingSlots] = useState(false);
+
+  useEffect(() => {
+    if (!preCarId) return;
+    fetch('/api/cars')
+      .then(r => r.json())
+      .then(data => {
+        if (data.success) {
+          const found = data.data.find(c => c.id === parseInt(preCarId));
+          if (found) setCar(found);
+        }
+      });
+  }, [preCarId]);
 
   const [form, setForm] = useState({ name: '', phone: '', notes: '' });
   const [selectedSlot, setSelectedSlot] = useState('');
@@ -102,7 +115,18 @@ export default function BookingPage() {
 
       <main className="pub-main" style={{ maxWidth: 560 }}>
         <h2 style={{ color: '#1e2d3d', marginBottom: 4 }}>Schedule a Visit</h2>
-        <p style={{ color: '#888', marginBottom: 24, fontSize: '0.9rem' }}>Pick a date and time — each slot is 1 hour, first-come first-served.</p>
+        <p style={{ color: '#888', marginBottom: car ? 12 : 24, fontSize: '0.9rem' }}>Pick a date and time — each slot is 1 hour, first-come first-served.</p>
+
+        {car && (
+          <div style={{ background: '#eef3f7', borderRadius: 10, padding: '12px 16px', marginBottom: 24, display: 'flex', flexDirection: 'column', gap: 4 }}>
+            <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#7a93a8', letterSpacing: '0.05em', textTransform: 'uppercase' }}>Interested in</span>
+            <span style={{ fontSize: '1.05rem', fontWeight: 800, color: '#1e2d3d' }}>{car.model}{car.year ? ` (${car.year})` : ''}</span>
+            <div style={{ display: 'flex', gap: 16, fontSize: '0.82rem', color: '#555' }}>
+              {car.ref_no && <span>Ref: <strong>{car.ref_no}</strong></span>}
+              <span>RM <strong>{car.price?.toLocaleString()}</strong></span>
+            </div>
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
 
