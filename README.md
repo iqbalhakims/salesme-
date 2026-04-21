@@ -1,6 +1,6 @@
 # Car Sales CRM
 
-A full-stack Customer Relationship Management (CRM) system for car dealerships. Provides a public-facing car listing site and a protected admin panel for managing inventory, leads, appointments, and media uploads.
+A full-stack Customer Relationship Management (CRM) system for car dealerships. Provides a public-facing car listing site and a protected admin panel for managing inventory, leads, appointments, media uploads, and system health.
 
 ---
 
@@ -11,6 +11,8 @@ A full-stack Customer Relationship Management (CRM) system for car dealerships. 
 - [Project Structure](#project-structure)
 - [Database Schema](#database-schema)
 - [API Reference](#api-reference)
+- [User Access Control](#user-access-control)
+- [System Monitor](#system-monitor)
 - [Environment Variables](#environment-variables)
 - [Getting Started](#getting-started)
   - [Local Development](#local-development)
@@ -26,13 +28,14 @@ A full-stack Customer Relationship Management (CRM) system for car dealerships. 
 
 ## Features
 
-### Public
+### Public (no login required)
 - Browse all available cars with search, filtering, and sorting
 - Filter by make/model, price range, year, mileage, and condition
 - View car detail page with full image gallery and video
 - Submit a lead (name + phone) to express interest in a car
+- Book an appointment online
 
-### Admin (JWT-protected)
+### Admin Panel (`/admin/login`)
 - Secure login with bcrypt-hashed password and 7-day JWT session
 - Add, edit, and delete car listings (model, price, year, mileage, condition, grade, ref no.)
 - Upload multiple images and videos per car
@@ -40,7 +43,8 @@ A full-stack Customer Relationship Management (CRM) system for car dealerships. 
 - Manage leads — view contact info, update status, set follow-up dates
 - Create and manage appointments tied to leads (scheduled / completed / cancelled)
 - Change car status (available / sold / reserved)
-- Generate template-based marketing messages per car
+- **User Management** — create staff accounts with granular permissions (Read / Create / Edit / Delete)
+- **System Monitor** — live CPU, RAM, Node.js heap, API traffic, DB latency, and upload storage dashboards
 
 ---
 
@@ -59,7 +63,7 @@ A full-stack Customer Relationship Management (CRM) system for car dealerships. 
 | E2E Testing | Cypress 15 |
 | Unit Testing | Jest 29 |
 | Load Testing | K6 |
-| Monitoring | Prometheus |
+| Monitoring | Prometheus + in-app System Monitor |
 
 ---
 
@@ -69,57 +73,68 @@ A full-stack Customer Relationship Management (CRM) system for car dealerships. 
 car-sales-crm/
 ├── backend/
 │   ├── src/
-│   │   ├── app.js                  # Express app entry point
+│   │   ├── app.js                      # Express app entry point
 │   │   ├── config/
-│   │   │   └── database.js         # MySQL connection pool (max 10)
-│   │   ├── controllers/            # Request handlers & business logic
-│   │   │   ├── authController.js
+│   │   │   └── database.js             # MySQL connection pool (with query latency tracking)
+│   │   ├── controllers/
+│   │   │   ├── authController.js       # Login, verify, admin seed on startup
 │   │   │   ├── carController.js
 │   │   │   ├── imageController.js
 │   │   │   ├── videoController.js
 │   │   │   ├── dentController.js
 │   │   │   ├── leadController.js
 │   │   │   ├── appointmentController.js
-│   │   │   └── messageController.js
-│   │   ├── models/                 # Database query abstractions
+│   │   │   ├── messageController.js
+│   │   │   ├── systemController.js     # CPU / RAM / API / DB / storage stats
+│   │   │   └── userController.js       # Staff user CRUD
+│   │   ├── models/
 │   │   │   ├── carModel.js
 │   │   │   ├── imageModel.js
 │   │   │   ├── videoModel.js
 │   │   │   ├── dentModel.js
 │   │   │   ├── leadModel.js
 │   │   │   └── appointmentModel.js
-│   │   ├── routes/                 # Express route definitions
+│   │   ├── routes/
 │   │   │   ├── authRoutes.js
 │   │   │   ├── carRoutes.js
 │   │   │   ├── imageRoutes.js
 │   │   │   ├── videoRoutes.js
 │   │   │   ├── leadRoutes.js
 │   │   │   ├── appointmentRoutes.js
-│   │   │   └── messageRoutes.js
+│   │   │   ├── messageRoutes.js
+│   │   │   ├── systemRoutes.js         # GET /api/system/stats
+│   │   │   └── userRoutes.js           # CRUD /api/users (admin only)
 │   │   ├── middleware/
-│   │   │   ├── auth.js             # JWT verification middleware
-│   │   │   └── upload.js           # Multer config
+│   │   │   ├── auth.js                 # JWT verification
+│   │   │   ├── upload.js               # Multer config
+│   │   │   ├── requireAdmin.js         # Role guard (admin only)
+│   │   │   └── requestMetrics.js       # Per-request latency + status tracking
+│   │   ├── utils/
+│   │   │   └── metricsStore.js         # In-memory per-minute bucket store (6h)
 │   │   └── services/
-│   │       └── messageService.js   # Marketing message templates
-│   ├── uploads/                    # Persisted uploaded files (volume-mounted)
+│   │       └── messageService.js
+│   ├── uploads/                        # Persisted uploaded files (volume-mounted)
 │   ├── Dockerfile
 │   └── package.json
 │
 ├── frontend/
 │   ├── src/
-│   │   ├── App.js                  # Route definitions
-│   │   ├── auth.js                 # Token read/write helpers
-│   │   ├── ProtectedRoute.js       # Admin route guard
+│   │   ├── App.js
+│   │   ├── auth.js                     # Token helpers + authFetch
+│   │   ├── PermContext.js              # React context for role + permissions
+│   │   ├── ProtectedRoute.js           # Route guard + injects PermContext
 │   │   ├── pages/
 │   │   │   ├── public/
-│   │   │   │   ├── HomePage.js     # Public car listing & search
-│   │   │   │   └── CarDetailPage.js
+│   │   │   │   ├── HomePage.js
+│   │   │   │   ├── CarDetailPage.js
+│   │   │   │   └── BookingPage.js
 │   │   │   ├── LoginPage.js
-│   │   │   ├── AdminPage.js
-│   │   │   ├── CarsPage.js
-│   │   │   ├── LeadsPage.js
-│   │   │   └── MessagesPage.js
-│   │   └── components/
+│   │   │   ├── AdminPage.js            # Navbar + tab router
+│   │   │   ├── CarsPage.js             # Permission-aware
+│   │   │   ├── LeadsPage.js            # Permission-aware
+│   │   │   ├── AppointmentsPage.js
+│   │   │   ├── SystemPage.js           # Live system monitor dashboard
+│   │   │   └── UsersPage.js            # Staff user management (admin only)
 │   ├── cypress/
 │   │   ├── e2e/
 │   │   │   ├── 01-public.cy.js
@@ -129,23 +144,22 @@ car-sales-crm/
 │   │   └── support/
 │   ├── public/
 │   │   └── index.html
-│   ├── nginx.conf                  # Nginx reverse proxy config
-│   ├── cypress.config.js
+│   ├── nginx.conf
 │   ├── Dockerfile
 │   └── package.json
 │
 ├── k6/
-│   ├── smoke-test.js               # Low-load validation (1 VU, 30s)
-│   └── stress-test.js              # High-load stress test
+│   ├── smoke-test.js
+│   └── stress-test.js
 │
 ├── monitoring/
-│   └── prometheus.yml              # Scrape config for metrics
+│   └── prometheus.yml
 │
-├── init.sql                        # Database initialisation script
-├── docker-compose.yml              # Orchestrates all services
+├── init.sql                            # DB schema (users table auto-created on startup too)
+├── docker-compose.yml
 └── .github/
     └── workflows/
-        └── deploy.yml              # CI/CD pipeline
+        └── deploy.yml
 ```
 
 ---
@@ -203,13 +217,26 @@ car-sales-crm/
 | `status` | ENUM | `scheduled` / `completed` / `cancelled` |
 | `created_at` | TIMESTAMP | |
 
-> **Auto-migrations:** `carModel.js` runs ALTER TABLE on startup to add `year`, `grade`, and `ref_no` columns if missing — no manual migration needed.
+### `users`
+| Column | Type | Notes |
+|--------|------|-------|
+| `id` | INT PK AUTO_INCREMENT | |
+| `username` | VARCHAR(100) UNIQUE | |
+| `password_hash` | VARCHAR(255) | bcrypt |
+| `role` | ENUM | `admin` / `staff` |
+| `perm_view` | TINYINT(1) | Can log in and read data |
+| `perm_create` | TINYINT(1) | Can add cars, leads, appointments |
+| `perm_edit` | TINYINT(1) | Can edit records and change status |
+| `perm_delete` | TINYINT(1) | Can delete records |
+| `created_at` | TIMESTAMP | |
+
+> **Auto-migrations:** `carModel.js` runs `ALTER TABLE` on startup to add `year`, `grade`, and `ref_no` columns if missing. The `users` table is also created on startup via `seedAdmin()` if it doesn't exist.
 
 ---
 
 ## API Reference
 
-All protected endpoints require the header:
+All protected endpoints require:
 ```
 Authorization: Bearer <token>
 ```
@@ -218,65 +245,74 @@ Authorization: Bearer <token>
 
 | Method | Endpoint | Auth | Description |
 |--------|----------|------|-------------|
-| POST | `/api/auth/login` | Public | Admin login, returns JWT |
-| GET | `/api/auth/verify` | Protected | Verify token validity |
+| POST | `/api/auth/login` | Public | Login, returns JWT with role + perms |
+| GET | `/api/auth/verify` | Protected | Verify token, returns username + role + perms |
 
 ### Cars
 
 | Method | Endpoint | Auth | Description |
 |--------|----------|------|-------------|
 | GET | `/api/cars` | Public | List all cars |
-| POST | `/api/cars` | Admin | Create a new car |
-| PUT | `/api/cars/:id` | Admin | Update car details |
-| PATCH | `/api/cars/:id/status` | Admin | Update car status |
-| DELETE | `/api/cars/:id` | Admin | Delete a car |
+| POST | `/api/cars` | Staff | Create a new car |
+| PUT | `/api/cars/:id` | Staff | Update car details |
+| PATCH | `/api/cars/:id/status` | Staff | Update car status |
+| DELETE | `/api/cars/:id` | Staff | Delete a car |
 
 ### Car Images
 
 | Method | Endpoint | Auth | Description |
 |--------|----------|------|-------------|
 | GET | `/api/cars/:id/images` | Public | Get images for a car |
-| POST | `/api/cars/:id/images` | Admin | Upload image (`multipart/form-data`) |
-| DELETE | `/api/cars/:id/images/:imageId` | Admin | Delete an image |
+| POST | `/api/cars/:id/images` | Staff | Upload image (`multipart/form-data`) |
+| DELETE | `/api/cars/:id/images/:imageId` | Staff | Delete an image |
 
 ### Car Videos
 
 | Method | Endpoint | Auth | Description |
 |--------|----------|------|-------------|
 | GET | `/api/cars/:id/videos` | Public | Get videos for a car |
-| POST | `/api/cars/:id/videos` | Admin | Upload video (`multipart/form-data`) |
-| DELETE | `/api/cars/:id/videos/:videoId` | Admin | Delete a video |
+| POST | `/api/cars/:id/videos` | Staff | Upload video (`multipart/form-data`) |
+| DELETE | `/api/cars/:id/videos/:videoId` | Staff | Delete a video |
 
 ### Car Dents / Scratches
 
 | Method | Endpoint | Auth | Description |
 |--------|----------|------|-------------|
 | GET | `/api/cars/:id/dents` | Public | Get dent records for a car |
-| POST | `/api/cars/:id/dents` | Admin | Upload dent image |
-| DELETE | `/api/cars/:id/dents/:dentId` | Admin | Delete dent record |
+| POST | `/api/cars/:id/dents` | Staff | Upload dent image |
+| DELETE | `/api/cars/:id/dents/:dentId` | Staff | Delete dent record |
 
 ### Leads
 
 | Method | Endpoint | Auth | Description |
 |--------|----------|------|-------------|
-| GET | `/api/leads` | Admin | List all leads |
+| GET | `/api/leads` | Staff | List all leads |
 | POST | `/api/leads` | Public | Submit a new lead |
-| PATCH | `/api/leads/:id` | Admin | Update lead status or follow-up date |
+| PATCH | `/api/leads/:id` | Staff | Update lead status or follow-up date |
 
 ### Appointments
 
 | Method | Endpoint | Auth | Description |
 |--------|----------|------|-------------|
-| GET | `/api/appointments/lead/:leadId` | Admin | Get appointments for a lead |
-| POST | `/api/appointments` | Admin | Create a new appointment |
-| PATCH | `/api/appointments/:id/status` | Admin | Update appointment status |
-| DELETE | `/api/appointments/:id` | Admin | Delete an appointment |
+| GET | `/api/appointments/lead/:leadId` | Staff | Get appointments for a lead |
+| POST | `/api/appointments` | Staff | Create a new appointment |
+| PATCH | `/api/appointments/:id/status` | Staff | Update appointment status |
+| DELETE | `/api/appointments/:id` | Staff | Delete an appointment |
 
-### Messages
+### Users (Admin only)
 
 | Method | Endpoint | Auth | Description |
 |--------|----------|------|-------------|
-| POST | `/api/messages/generate` | Admin | Generate a marketing message for a car |
+| GET | `/api/users` | Admin | List all users |
+| POST | `/api/users` | Admin | Create a staff user |
+| PATCH | `/api/users/:id/perms` | Admin | Update user permissions |
+| DELETE | `/api/users/:id` | Admin | Delete a staff user |
+
+### System Monitor
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| GET | `/api/system/stats` | Staff | CPU, RAM, process, API traffic, DB latency, storage |
 
 ### Health
 
@@ -286,13 +322,69 @@ Authorization: Bearer <token>
 
 ### Response Format
 
-All endpoints return JSON:
 ```json
 { "success": true, "data": { ... } }
 { "success": false, "message": "Error description" }
 ```
 
-HTTP status codes used: `200`, `201`, `400`, `401`, `404`, `500`.
+HTTP status codes used: `200`, `201`, `400`, `401`, `403`, `404`, `409`, `500`.
+
+---
+
+## User Access Control
+
+The system has two distinct areas:
+
+| Area | URL | Access |
+|------|-----|--------|
+| **Customer site** | `/` | Public — no login, always accessible |
+| **Admin panel** | `/admin/login` | Staff login required |
+
+### Permissions
+
+Staff accounts have four independently toggleable permissions:
+
+| Permission | Color | What it controls in the admin panel |
+|-----------|-------|--------------------------------------|
+| **Read** | Green | Can log in and view all data. Required — without it the account is blocked |
+| **Create** | Blue | Can add cars, leads, and appointments |
+| **Edit** | Amber | Can edit records and change car status |
+| **Delete** | Red | Can delete cars, leads, and records |
+
+The `admin` account (seeded from `.env` on startup) always has full access and cannot be modified or deleted.
+
+### Admin startup seeding
+
+On every server start, `seedAdmin()`:
+1. Runs `CREATE TABLE IF NOT EXISTS users` — safe to run on existing containers
+2. Checks if the admin username from `.env` exists
+3. If not, inserts it with a bcrypt-hashed password and full permissions
+
+This means **you can never lose admin access** even if you restart the container or the `users` table is missing.
+
+---
+
+## System Monitor
+
+Accessible via the **System** tab in the admin panel. All data is collected in-process — no external agents required.
+
+### Dashboards
+
+| Section | Metrics |
+|---------|---------|
+| **Infrastructure** | CPU usage %, load average (1/5/15m), RAM used %, Node.js heap % |
+| **API Traffic** | Requests per minute (bar chart), 4xx/5xx error overlay, avg response latency |
+| **Database** | Avg query latency, P95 latency, slow query count (>100ms) + timestamps |
+| **Upload Storage** | Disk used (MB), file count, avg MB per file |
+
+### How it works
+
+- **6-hour rolling window** — up to 7,200 data points at 3-second polling intervals
+- **Downsampled to 300 points** for SVG rendering (no chart library dependency)
+- **Hourly x-axis timestamps** on all line and bar charts
+- **Color thresholds** — metrics turn amber >60% and red >85%
+- **DB latency** — `pool.query` is wrapped to record every query duration; slow queries (>100ms) are stored separately with timestamps
+- **API metrics** — Express middleware records status code and latency into per-minute buckets
 
 ---
 
@@ -310,7 +402,7 @@ DB_USER=root
 DB_PASSWORD=your_db_password
 DB_NAME=carcrm
 
-# Admin credentials (seeds the single admin user on startup)
+# Admin credentials (seeded into users table on startup)
 ADMIN_USERNAME=admin
 ADMIN_PASSWORD=your_admin_password
 
@@ -350,6 +442,11 @@ npm install
 cp .env.example .env     # fill in your values
 npm run dev              # starts with nodemon on port 3000
 ```
+
+On startup the server will:
+- Wait for the DB to be ready
+- Create the `users` table if missing
+- Seed the admin user from `.env` if not already present
 
 #### 3. Frontend
 
@@ -472,6 +569,8 @@ Prometheus scrape targets are defined in [`monitoring/prometheus.yml`](monitorin
 - `mysqld-exporter` — MySQL metrics
 - Backend `/metrics` endpoint
 
+The in-app **System Monitor** (admin panel → System tab) provides real-time dashboards without any external tooling — useful during development and for quick health checks in production.
+
 ---
 
 ## Frontend Routes
@@ -480,15 +579,17 @@ Prometheus scrape targets are defined in [`monitoring/prometheus.yml`](monitorin
 |------|--------|-------------|
 | `/` | Public | Car listing homepage |
 | `/cars/:id` | Public | Car detail page |
-| `/admin/login` | Public | Admin login |
+| `/book` | Public | Appointment booking |
+| `/admin/login` | Public | Staff login |
 | `/admin/*` | Protected | Admin panel (requires JWT) |
 
 ---
 
 ## Security Notes
 
-- Passwords are hashed with **bcrypt** before storage.
+- Passwords are hashed with **bcrypt** (10 rounds) before storage.
 - All admin routes are protected with **JWT Bearer token** middleware.
+- The `admin` role is protected — its permissions and account cannot be modified via the API.
 - Database queries use **parameterised statements** to prevent SQL injection.
 - CORS is enabled; restrict the `origin` to your frontend domain in production.
 - Change all default secrets (`JWT_SECRET`, `ADMIN_PASSWORD`, `DB_PASSWORD`) before deploying.
