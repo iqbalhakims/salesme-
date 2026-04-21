@@ -1,5 +1,0 @@
-# CVE-2024-21538: cross-spawn ReDoS
-# Located in usr/local/lib/node_modules/npm/ — bundled npm CLI inside the node:20-alpine base image.
-# This is not our application code and is not reachable at runtime.
-# Will be resolved when upstream node:20-alpine updates its bundled npm.
-CVE-2024-21538

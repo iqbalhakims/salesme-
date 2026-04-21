@@ -62,7 +62,7 @@ jobs:
           exit-code: 1
           severity: CRITICAL,HIGH
           ignore-unfixed: true
-          trivyignores: ./backend/.trivyignore
+          skip-dirs: /usr/local/lib/node_modules,/opt/yarn-v1.22.22
 
   deploy:
     needs: build-and-push
