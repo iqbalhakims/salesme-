@@ -669,6 +669,20 @@ The in-app **System Monitor** (admin panel → System tab) provides real-time da
 
 ---
 
+## Demo Access
+
+A read-only guest account is available for exploring the admin panel:
+
+| Field | Value |
+|-------|-------|
+| **URL** | `/admin/login` |
+| **Username** | `guest` |
+| **Password** | `guestguest` |
+
+This account has **Read-only** permission — it can view all data but cannot create, edit, or delete anything.
+
+---
+
 ## Security Notes
 
 - Passwords are hashed with **bcrypt** (10 rounds) before storage.
