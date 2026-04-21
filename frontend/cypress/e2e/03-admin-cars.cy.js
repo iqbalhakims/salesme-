@@ -43,9 +43,10 @@ describe('Admin - Cars Management', () => {
       .should('be.visible');
   });
 
-  it('shows navigation tabs for Cars, Leads, Messages', () => {
+  it('shows navigation tabs for Cars, Leads, Appointments, System', () => {
     cy.contains('nav button', 'Cars').should('be.visible');
     cy.contains('nav button', 'Leads').should('be.visible');
-    cy.contains('nav button', 'Messages').should('be.visible');
+    cy.contains('nav button', 'Appointments').should('be.visible');
+    cy.contains('nav button', 'System').should('be.visible');
   });
 });

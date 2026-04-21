@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import DashboardPage from './DashboardPage';
 import CarsPage from './CarsPage';
 import LeadsPage from './LeadsPage';
 import SystemPage from './SystemPage';
@@ -10,7 +11,7 @@ import { usePerms } from '../PermContext';
 import '../index.css';
 
 export default function AdminPage() {
-  const [page, setPage] = useState('cars');
+  const [page, setPage] = useState('dashboard');
   const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate();
   const { role } = usePerms();
@@ -30,6 +31,7 @@ export default function AdminPage() {
           {menuOpen ? '✕' : '☰'}
         </button>
         <div className={`nav-links${menuOpen ? ' open' : ''}`}>
+          <button className={page === 'dashboard' ? 'active' : ''} onClick={() => navTo('dashboard')}>Dashboard</button>
           <button className={page === 'cars' ? 'active' : ''} onClick={() => navTo('cars')}>Cars</button>
           <button className={page === 'leads' ? 'active' : ''} onClick={() => navTo('leads')}>Leads</button>
           <button className={page === 'appointments' ? 'active' : ''} onClick={() => navTo('appointments')}>Appointments</button>
@@ -42,6 +44,7 @@ export default function AdminPage() {
         </div>
       </nav>
       <div className="container">
+        {page === 'dashboard'    && <DashboardPage onNavigate={navTo} />}
         {page === 'cars'         && <CarsPage />}
         {page === 'leads'        && <LeadsPage />}
         {page === 'appointments' && <AppointmentsPage />}
