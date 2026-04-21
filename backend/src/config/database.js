@@ -11,4 +11,17 @@ const pool = mysql.createPool({
   queueLimit: 0,
 });
 
+// Wrap pool.query to record DB latency metrics
+const originalQuery = pool.query.bind(pool);
+pool.query = async function (...args) {
+  const start = Date.now();
+  try {
+    return await originalQuery(...args);
+  } finally {
+    // lazy-require to avoid circular dependency at startup
+    const { recordDbQuery } = require('../utils/metricsStore');
+    recordDbQuery(Date.now() - start);
+  }
+};
+
 module.exports = pool;

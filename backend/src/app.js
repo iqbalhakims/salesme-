@@ -12,6 +12,7 @@ const appointmentRoutes = require('./routes/appointmentRoutes');
 const systemRoutes = require('./routes/systemRoutes');
 
 const pool = require('./config/database');
+const requestMetrics = require('./middleware/requestMetrics');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -32,6 +33,7 @@ async function waitForDb(retries = 10, delayMs = 3000) {
 
 app.use(cors());
 app.use(express.json());
+app.use(requestMetrics);
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 app.use('/api/auth', authRoutes);
