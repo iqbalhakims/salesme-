@@ -2,12 +2,24 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { authFetch } from '../auth';
 
 const POLL_MS = 3000;
-const MAX_POINTS = 40; // ~2 minutes of history
+const MAX_POINTS = 7200; // 6 hours at 3s intervals
+const RENDER_POINTS = 300; // max SVG path points for performance
 
 function lineColor(percent) {
   if (percent > 85) return '#ef4444';
   if (percent > 60) return '#f59e0b';
   return null; // use default passed in
+}
+
+function downsample(data, n) {
+  if (data.length <= n) return data;
+  const result = [];
+  const step = (data.length - 1) / (n - 1);
+  for (let i = 0; i < n; i++) {
+    const idx = Math.round(i * step);
+    result.push(data[Math.min(idx, data.length - 1)]);
+  }
+  return result;
 }
 
 function LineChart({ data, max = 100, color, label, unit = '%', height = 90 }) {
@@ -25,8 +37,9 @@ function LineChart({ data, max = 100, color, label, unit = '%', height = 90 }) {
     );
   }
 
-  const points = data.map((v, i) => {
-    const x = pad.left + (i / (MAX_POINTS - 1)) * chartW;
+  const sampled = downsample(data, RENDER_POINTS);
+  const points = sampled.map((v, i) => {
+    const x = pad.left + (i / (sampled.length - 1)) * chartW;
     const y = pad.top + chartH - (Math.min(v, max) / max) * chartH;
     return [x, y];
   });
@@ -175,7 +188,7 @@ export default function SystemPage() {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
         <h2 style={{ margin: 0, fontSize: '1.2rem' }}>System Monitor</h2>
         <span style={{ fontSize: '0.8rem', color: '#9ca3af' }}>
-          Live · {POLL_MS / 1000}s refresh
+          Live · {POLL_MS / 1000}s refresh · 6h window
           {lastUpdated && ` · ${lastUpdated.toLocaleTimeString()}`}
         </span>
       </div>
