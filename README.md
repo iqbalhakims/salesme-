@@ -24,6 +24,7 @@ A full-stack Customer Relationship Management (CRM) system for car dealerships. 
   - [E2E Tests (Cypress)](#e2e-tests-cypress)
   - [Load Tests (K6)](#load-tests-k6)
 - [Monitoring](#monitoring)
+- [Infrastructure & Scaling](#infrastructure--scaling)
 
 ---
 
@@ -680,6 +681,83 @@ A read-only guest account is available for exploring the admin panel:
 | **Password** | `guestguest` |
 
 This account has **Read-only** permission — it can view all data but cannot create, edit, or delete anything.
+
+---
+
+## Infrastructure & Scaling
+
+### File Storage — DigitalOcean Spaces
+
+Images and videos are stored in **DigitalOcean Spaces** (S3-compatible object storage), decoupled from the Droplet.
+
+**Pricing:**
+- **$5/month** base — includes 250 GB storage + 1 TB outbound transfer
+- Extra storage: $0.02/GB
+- Extra transfer: $0.01/GB
+- Built-in CDN included at no extra cost
+
+**Key benefit:** Spaces is independent of your Droplet. You can scale, destroy, or replace Droplets freely without losing any files. All Droplets connect to the same Spaces bucket using the same env vars.
+
+---
+
+### Scaling Stages
+
+#### Stage 1 — Starting out
+```
+User → Single Droplet (Node API + MySQL) → Spaces (images/videos)
+```
+- 1 Droplet handles everything
+- Spaces for file storage
+- ~$5–15/month
+
+#### Stage 2 — Getting traffic (recommended next step)
+```
+User → Spaces CDN (images direct)
+     → Droplet (API) → Managed MySQL (DO Database)
+```
+- Separate MySQL into **DO Managed Database** — DB survives Droplet restarts
+- Enable **Spaces CDN** — images load from edge, zero load on your server
+- ~$30–50/month
+
+#### Stage 3 — Real scale
+```
+User → Spaces CDN (images/videos)
+     → Load Balancer
+          → Droplet 1 (API)
+          → Droplet 2 (API)
+     → Managed MySQL (primary + replica)
+     → Redis (cache hot listings)
+```
+- Load balancer splits traffic across multiple API Droplets
+- Read replica for MySQL — car listings are mostly reads
+- Redis cache for popular listings (avoid repeated DB hits)
+- ~$100–200/month
+
+---
+
+### Key Optimisations for Car Listing Sites
+
+| Concern | Solution |
+|---------|---------|
+| Images are large | Spaces CDN + compress before upload |
+| Search/filter is heavy | Add index on `model`, `price`, `condition`, `year` in MySQL |
+| Listings rarely change | Cache with Redis (5–10 min TTL) |
+| Videos are huge | Spaces CDN mandatory, lazy-load on frontend |
+| Mobile users | CDN edge nodes serve from nearest location |
+
+> **Recommended:** Jump straight to Stage 2. Move MySQL to DO Managed Database and enable Spaces CDN — this gives 80% of the scaling benefits at low cost, and you can add a load balancer later when needed.
+
+---
+
+### Required GitHub Secrets for Spaces (when enabled)
+
+| Secret | Description |
+|--------|-------------|
+| `DO_SPACES_KEY` | Spaces access key |
+| `DO_SPACES_SECRET` | Spaces secret key |
+| `DO_SPACES_ENDPOINT` | e.g. `https://sgp1.digitaloceanspaces.com` |
+| `DO_SPACES_BUCKET` | Your bucket name |
+| `DO_SPACES_REGION` | e.g. `sgp1` |
 
 ---
 
