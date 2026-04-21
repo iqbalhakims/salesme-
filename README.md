@@ -13,6 +13,7 @@ A full-stack Customer Relationship Management (CRM) system for car dealerships. 
 - [API Reference](#api-reference)
 - [User Access Control](#user-access-control)
 - [System Monitor](#system-monitor)
+- [Known Issues & Troubleshooting](#known-issues--troubleshooting)
 - [Environment Variables](#environment-variables)
 - [Getting Started](#getting-started)
   - [Local Development](#local-development)
@@ -385,6 +386,89 @@ Accessible via the **System** tab in the admin panel. All data is collected in-p
 - **Color thresholds** — metrics turn amber >60% and red >85%
 - **DB latency** — `pool.query` is wrapped to record every query duration; slow queries (>100ms) are stored separately with timestamps
 - **API metrics** — Express middleware records status code and latency into per-minute buckets
+
+---
+
+## Known Issues & Troubleshooting
+
+This section documents real bugs encountered during development of the user management module and how each was resolved.
+
+---
+
+### 1. Cars not showing on homepage after user module was added
+
+**Symptom:** The public homepage showed no cars. The admin panel was also unreachable. All API routes returned connection errors.
+
+**Root cause:** The `users` table was added to `init.sql`, which MySQL only executes on the very first container creation. On an already-running container the table never got created. When the server started, `seedAdmin()` tried to query `SELECT id FROM users WHERE username = ?` — the table didn't exist, so it threw an error before `app.listen()` was ever called. Because the server never started listening, **all routes failed**, including the public `GET /api/cars` endpoint the homepage depends on.
+
+**Fix:** `seedAdmin()` now runs `CREATE TABLE IF NOT EXISTS users` itself before querying it, making it safe regardless of whether the container is new or existing:
+
+```js
+// authController.js — runs on every server startup
+async function seedAdmin() {
+  await pool.query(`CREATE TABLE IF NOT EXISTS users ( ... )`);
+  // then check and insert admin row
+}
+```
+
+**Lesson:** Never rely solely on `init.sql` for schema changes on a live container. Any new table that is queried at startup must be created defensively with `IF NOT EXISTS` in application code.
+
+---
+
+### 2. "View" permission confused with public car browsing
+
+**Symptom:** When building the user permission system, naming the first permission "View" was ambiguous — customers already "view" cars on the public site without any login. Staff reviewing the Users page assumed "View" controlled what customers could see.
+
+**Root cause:** Poor naming. The permission was meant to control whether a staff account could log in to the admin panel and read CRM data — not anything related to the public site.
+
+**Fix:** Renamed the permission from `View` to `Read` and added a clear banner at the top of the Users page:
+
+> **Admin Panel Access Only** — these users log in at `/admin/login` to manage the CRM. The public customer site (`/`) is always open with no login required.
+
+The two areas are completely separate:
+- `/` — public, no authentication, customers browse cars freely
+- `/admin/login` — internal staff only, controlled by `Read / Create / Edit / Delete` permissions
+
+---
+
+### 3. JSX syntax error — cars page broke after permission guard was added
+
+**Symptom:** After conditionally hiding the "Add Car" form for users without `create` permission, the React app crashed with:
+
+```
+JSX expressions must have one parent element.
+'}' expected.
+```
+
+**Root cause:** The conditional render was written as `{perms.create && <div className="card">...</div>}` but the closing `}` was placed after the next sibling `<div>`, leaving both elements sharing the same conditional expression without a parent wrapper.
+
+**Fix:** Closed the conditional immediately after the form div, before the inventory list div:
+
+```jsx
+{perms.create && <div className="card">
+  {/* Add Car form */}
+</div>}   {/* ← closing } was missing here */}
+
+<div className="card">
+  {/* Car Inventory — always visible */}
+</div>
+```
+
+---
+
+### 4. Admin account could be deleted or permission-stripped
+
+**Symptom** (caught during development, before it could occur in production): The user delete and permission-update endpoints initially had no guard against modifying the `admin` role account. A staff user with delete access could theoretically call `DELETE /api/users/1` and remove the only admin.
+
+**Fix:** Both `remove` and `updatePerms` in `userController.js` check the target user's role before acting:
+
+```js
+if (user.role === 'admin') {
+  return res.status(403).json({ success: false, message: 'Cannot delete the admin account' });
+}
+```
+
+The frontend also renders the admin row as read-only with no action buttons.
 
 ---
 
