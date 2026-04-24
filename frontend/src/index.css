@@ -1,29 +1,48 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  background: #f5f5f5;
-  color: #333;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Amazon Ember', sans-serif;
+  background: #f2f3f3;
+  color: #16191f;
 }
 
-.container { max-width: 1100px; margin: 0 auto; padding: 16px; }
+.container { max-width: 1200px; margin: 0 auto; padding: 20px 24px; }
 
-/* ── Nav ── */
+/* ── Nav — AWS dark topbar ── */
 .admin-nav {
-  background: #5ba4cf;
-  padding: 12px 20px;
+  background: #232f3e;
+  padding: 0 20px;
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 0;
   position: relative;
+  height: 48px;
+  border-bottom: 1px solid #1a2332;
 }
-.admin-nav h1 { color: white; font-size: 1.1rem; flex: 1; }
+.admin-nav h1 {
+  color: white;
+  font-size: 1rem;
+  font-weight: 700;
+  flex: 1;
+  letter-spacing: 0.01em;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.admin-nav h1::before {
+  content: '';
+  display: inline-block;
+  width: 3px;
+  height: 18px;
+  background: #ec7211;
+  border-radius: 2px;
+}
 
 .hamburger {
   display: none;
   background: none; border: none;
-  color: white; font-size: 1.4rem;
+  color: white; font-size: 1.3rem;
   cursor: pointer; padding: 4px 8px;
   line-height: 1;
 }
@@ -31,18 +50,37 @@ body {
 .nav-links {
   display: flex;
   align-items: center;
-  gap: 6px;
+  height: 48px;
+  gap: 0;
 }
 .nav-links button {
-  background: none; border: none; color: rgba(255,255,255,0.8);
-  cursor: pointer; font-size: 0.9rem; padding: 6px 12px;
-  border-radius: 4px; white-space: nowrap;
+  background: none; border: none; color: #d5dbdb;
+  cursor: pointer; font-size: 0.85rem; padding: 0 14px;
+  height: 48px; white-space: nowrap;
+  border-bottom: 3px solid transparent;
+  border-top: 3px solid transparent;
+  transition: color 0.15s, border-color 0.15s;
+  font-weight: 500;
 }
-.nav-links button.active,
-.nav-links button:hover { background: rgba(255,255,255,0.2); color: white; }
+.nav-links button:hover { color: #fff; }
+.nav-links button.active {
+  color: #fff;
+  border-bottom-color: #ec7211;
+  font-weight: 600;
+}
 
-.nav-util { background: rgba(255,255,255,0.15) !important; color: white !important; }
-.nav-logout { border: 1px solid rgba(255,255,255,0.3) !important; color: rgba(255,255,255,0.8) !important; }
+.nav-util {
+  background: none !important;
+  color: #d5dbdb !important;
+  border: 1px solid rgba(255,255,255,0.2) !important;
+  border-radius: 3px !important;
+  margin-left: 6px;
+  height: 30px !important;
+  padding: 0 10px !important;
+  font-size: 0.8rem !important;
+}
+.nav-util:hover { background: rgba(255,255,255,0.1) !important; color: #fff !important; }
+.nav-logout { border-color: rgba(255,255,255,0.15) !important; }
 
 /* ── Card ── */
 .card {
