@@ -55,7 +55,18 @@ app.get('/health', (_req, res) => {
   res.json({ status: 'ok', message: 'Car Sales CRM API is running' });
 });
 
+async function runMigrations() {
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS visitor_sessions (
+      session_id VARCHAR(36) PRIMARY KEY,
+      first_seen TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      last_seen TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    )
+  `);
+}
+
 waitForDb()
+  .then(() => runMigrations())
   .then(() => seedAdmin())
   .then(() => app.listen(PORT, () => console.log(`Server running on port ${PORT}`)))
   .catch(err => { console.error('Could not connect to DB:', err.message); process.exit(1); });
