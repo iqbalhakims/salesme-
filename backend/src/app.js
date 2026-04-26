@@ -74,6 +74,13 @@ async function runMigrations() {
   if (tokenCols.length === 0) {
     await pool.query(`ALTER TABLE leads ADD COLUMN profile_token VARCHAR(64) NULL UNIQUE AFTER email`);
   }
+  // Backfill profile_token for any leads that don't have one
+  const [missing] = await pool.query(`SELECT id FROM leads WHERE profile_token IS NULL`);
+  for (const lead of missing) {
+    const token = require('crypto').randomBytes(32).toString('hex');
+    await pool.query(`UPDATE leads SET profile_token = ? WHERE id = ?`, [token, lead.id]);
+  }
+  if (missing.length > 0) console.log(`[Migration] Backfilled profile_token for ${missing.length} leads`);
 }
 
 waitForDb()
